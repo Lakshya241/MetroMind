@@ -2,6 +2,8 @@
 
 # 🚇 METROMIND
 ### Smart Metro Route & Fare Computation Engine
+
+A Java-based Bengaluru Metro route planner featuring Dijkstra’s shortest-path algorithms, fare calculation, interchange optimization, and network disruption simulation.
 **Bengaluru Namma Metro (BMRCL) Edition**
 
 [![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
@@ -187,5 +189,3 @@ For in-depth explanations, refer to the dedicated companion manuals:
 ---
 
 ## ⚖️ Disclaimer & Credits
-
-*Developed as an academic software engineering project demonstrating graph data structures and algorithm design. Transit station names, line designations, and network topologies are modeled after publicly available information regarding the Bengaluru Namma Metro. This project is independent and not affiliated with or endorsed by Bangalore Metro Rail Corporation Limited (BMRCL).*
