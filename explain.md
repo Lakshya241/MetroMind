@@ -638,41 +638,42 @@ finalFare = max(₹10, (baseFare - discount) + airportSurcharge)
 ---
 ### TicketType
 
-**What is it?** An enum listing the five categories of metro tickets, each with a discount rate.
+**What is it?** An enum listing the five categories of metro tickets and concession passes, each with a discount rate.
 
 **Important fields:**
-- `displayName` (`String`) — human-readable name
-- `discountPercent` (`double`) — the percentage discount applied to base fare
+- `title` (`String`) — human-readable category name
+- `discountPercentage` (`double`) — percentage discount applied to base fare
+- `description` (`String`) — passenger eligibility explanation
 
-| Ticket Type   | Discount |
-|---------------|----------|
-| Regular       | 0%       |
-| Student       | 20%      |
-| Senior Citizen| 30%      |
-| Differently Abled | 25% |
-| Employee      | 10%      |
+| Ticket Type | Discount | Eligibility |
+|---|---|---|
+| Standard Token / QR Ticket | 0% | Full base fare single journey token |
+| Namma Metro Smart Card (Varshik / NCMC) | 10% | Contactless rechargeable card with 10% concession |
+| Namma Metro Smart Card (Off-Peak / Weekend) | 20% | Off-peak and weekend concession |
+| Student Concession Pass | 25% | Subsidized student travel pass |
+| Senior Citizen Pass | 30% | Senior citizen welfare concession |
 
-**Simple example:**
+**Worked Numerical Example:**
 
-Journey of 15 km → base fare ₹40.
-
-- Regular: ₹40 − 0% = **₹40**
-- Student: ₹40 − 20% = **₹32**
-- Senior Citizen: ₹40 − 30% = **₹28**
-- Differently Abled: ₹40 − 25% = **₹30**
-- Employee: ₹40 − 10% = **₹36**
+Consider a commute from **Whitefield (Kadugodi)** to **Lalbagh**:
+- Route distance: **27.00 km**
+- Distance slab: `21.1 - 32.0 km` $\implies$ Base Fare = **₹50.00**
+- Selected ticket type: **Namma Metro Smart Card** (10% discount)
+- Discount amount: $50.00 \times 10\% = -\text{₹}5.00$
+- Airport surcharge: **₹0.00** (does not traverse the airport corridor)
+- Final payable amount: $\max(10.00, (50.00 - 5.00) + 0.00) =$ **₹45.00**
 
 ---
 
 ## 22. Airport Surcharge — When and How Applied
 
-The airport station (Kempegowda International Airport — KIAL) is special. It's on the Yellow Line, and reaching it costs an extra **₹20** on top of the regular fare.
+The airport terminal station (*KIAL Airport Terminal*) is special. It is located on the **Blue Line (Airport & ORR)**, and traveling to or from it incurs an extra **₹20.00 infrastructure surcharge** on top of the discounted base fare.
 
-**How detection works:** FareEngine checks every station in the route's path for a name that contains "Airport" or "KIAL" (case-insensitive string matching). This is a simple but effective approach for a known fixed station name.
+**How detection works:** `RouteResult.usesAirportExpress()` inspects all stations in the computed path and edge connections for names matching `"airport"` or `"kial"`. If matched, `FareEngine` applies `AIRPORT_SURCHARGE = 20.0`.
 
-**Why a surcharge?** Airport connections often involve extra infrastructure costs and are priced separately in many transit systems worldwide. This mirrors real-world policy.
+**Why a surcharge?** High-speed airport express corridors require dedicated civil infrastructure, luggage handling, and premium operating costs, mirroring international airport rail links.
 
-**When is it applied?** Only when the route *actually passes through* the airport station. If you're travelling from Majestic to Whitefield (no airport), no surcharge applies.
+**When is it applied?** Only when the computed route actually traverses the KIAL Airport station (e.g. Hebbal to KIAL Airport: Base ₹50.00 + Surcharge ₹20.00 = ₹70.00). Normal urban commutes incur ₹0.00 surcharge.
 
 ---
 
@@ -784,13 +785,13 @@ main()
         choice = readInt()   // get user's selection (1–7)
         
         switch(choice):
-          case 1 → handleJourneyPlanning()
-          case 2 → handleNetworkInfo()
-          case 3 → handleJourneyHistory()
-          case 4 → handleDisruptionSimulator()
-          case 5 → handleExport()
-          case 6 → handleSettings()
-          case 7 → printExitMessage() + break loop
+          case 1 → handleFindBestRoute()       // Plan best route, visual schematic & fare
+          case 2 → handleExploreNetwork()      // Browse lines, stations, junctions & search
+          case 3 → handleViewFareStructure()   // Official BMRCL slabs & concessions
+          case 4 → handleNetworkOperations()   // Disruption simulation, station/track toggles
+          case 5 → handleRecentJourneys()      // Audit log of session journeys
+          case 6 → handleExportData()          // Export receipts, route CSV, network CSV
+          case 7 → printExitMessage()          // Graceful exit & farewell banner
 ```
 
 This is a classic **menu-driven program** pattern. The program is always in one of two states: showing the menu, or handling a user's choice.
