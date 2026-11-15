@@ -7,10 +7,6 @@ import com.metromind.model.Station;
 import java.io.Serializable;
 import java.util.*;
 
-/**
- * Graph data structure representing the Metro transit network.
- * Vertices are Stations, and Edges are bidirectional Connections with distance and time weights.
- */
 public class MetroGraph implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -22,14 +18,10 @@ public class MetroGraph implements Serializable {
         this.adjacencyList = new HashMap<>();
     }
 
-    /**
-     * Registers a station into the network.
-     */
     public synchronized Station addStation(Station station) {
         if (station == null) return null;
         Station existing = stations.get(station.getName());
         if (existing != null) {
-            // Merge lines if station already exists
             for (MetroLine line : station.getLines()) {
                 existing.addLine(line);
             }
@@ -40,9 +32,6 @@ public class MetroGraph implements Serializable {
         return station;
     }
 
-    /**
-     * Retrieves or creates a station with the given name.
-     */
     public synchronized Station getOrCreateStation(String id, String name, MetroLine... lines) {
         Station s = stations.get(name);
         if (s == null) {
@@ -58,17 +47,11 @@ public class MetroGraph implements Serializable {
         return s;
     }
 
-    /**
-     * Looks up a station by exact or case-insensitive name.
-     */
     public Station getStation(String name) {
         if (name == null || name.trim().isEmpty()) return null;
         return stations.get(name.trim());
     }
 
-    /**
-     * Searches for stations containing the query string (substring match).
-     */
     public List<Station> searchStations(String query) {
         if (query == null || query.trim().isEmpty()) {
             return Collections.emptyList();
@@ -83,9 +66,6 @@ public class MetroGraph implements Serializable {
         return matches;
     }
 
-    /**
-     * Adds a track connection between two stations.
-     */
     public synchronized void addConnection(Station from, Station to, MetroLine line,
                                           double distanceKm, double timeMinutes, boolean bidirectional) {
         if (from == null || to == null || line == null) return;
@@ -104,24 +84,15 @@ public class MetroGraph implements Serializable {
         }
     }
 
-    /**
-     * Returns adjacent connections from the specified station.
-     */
     public List<Connection> getConnections(Station station) {
         if (station == null) return Collections.emptyList();
         return adjacencyList.getOrDefault(station, Collections.emptyList());
     }
 
-    /**
-     * Returns all registered stations.
-     */
     public Collection<Station> getAllStations() {
         return Collections.unmodifiableCollection(stations.values());
     }
 
-    /**
-     * Returns all stations that lie on a specific line.
-     */
     public List<Station> getStationsByLine(MetroLine line) {
         List<Station> lineStations = new ArrayList<>();
         for (Station s : stations.values()) {
@@ -133,9 +104,6 @@ public class MetroGraph implements Serializable {
         return lineStations;
     }
 
-    /**
-     * Returns all stations that act as interchange junctions.
-     */
     public List<Station> getInterchangeStations() {
         List<Station> interchanges = new ArrayList<>();
         for (Station s : stations.values()) {
@@ -147,9 +115,6 @@ public class MetroGraph implements Serializable {
         return interchanges;
     }
 
-    /**
-     * Toggles operational status of a station (e.g. for maintenance or emergency closure).
-     */
     public boolean toggleStationStatus(String stationName, boolean active) {
         Station s = getStation(stationName);
         if (s != null) {
@@ -159,9 +124,6 @@ public class MetroGraph implements Serializable {
         return false;
     }
 
-    /**
-     * Toggles operational status of a track segment between two stations.
-     */
     public boolean toggleTrackStatus(String fromName, String toName, boolean operational) {
         Station u = getStation(fromName);
         Station v = getStation(toName);
@@ -198,6 +160,6 @@ public class MetroGraph implements Serializable {
         for (List<Connection> list : adjacencyList.values()) {
             count += list.size();
         }
-        return count / 2; // Since bidirectional
+        return count / 2;
     }
 }

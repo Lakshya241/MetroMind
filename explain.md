@@ -6,21 +6,57 @@
 
 ## 1. What the Solution Is (Executive Summary)
 
-**MetroMind** is an advanced transit pathfinding and dynamic fare computation engine built as a modular, menu-driven console application in pure Java (JDK 17). It represents the **Bengaluru Namma Metro (BMRCL)** urban rapid rail network as a weighted, bidirectional graph.
+**MetroMind** is an advanced transit pathfinding and dynamic fare computation engine built as a menu-driven console application in pure Java (JDK 17). It represents the **Bengaluru Namma Metro (BMRCL)** urban rapid rail network as a weighted, bidirectional graph.
 
-The solution addresses three central challenges in commuter logistics across Bengaluru:
-1. **Multi-Criteria Route Optimization**: Computing the most efficient route between any two Bengaluru metro stations based on:
-   - **Shortest Physical Distance** (minimizing kilometers traveled across lines).
-   - **Fastest Travel Time** (minimizing actual minutes, including transfer walking and dwell penalties at major hubs like Majestic, MG Road, or Central Silk Board).
-   - **Fewest Interchanges** (minimizing train line transfers, prioritized by commuters traveling with baggage or during rush hours).
-2. **Dynamic Fare & Ticketing Engine**: Automatically evaluating transit fares across tiered distance slabs matching BMRCL fare policies, applying corridor-specific rules (such as the high-speed **KIAL Airport Express Corridor** surcharge), and factoring in passenger discount matrices (**Namma Metro Smart Card peak/off-peak discounts**, **Student passes**, and **Senior Citizen concessions**).
-3. **Resilient Network Management & Disruption Simulation**: Allowing live maintenance toggling (closing stations or tracks for repairs) with automatic real-time rerouting around blockages (e.g. bypassing a closed Majestic station via the Outer Ring Road corridor), dynamic station/track expansion, and export of trip itineraries to printable text tickets and analytical CSV spreadsheets.
+The solution directly addresses commuter navigation with:
+1. **Automated Best-Route Optimization**: Automatically calculates and delivers the single **Best Route** balancing travel duration, physical distance, and minimal platform transfers.
+2. **Terminal Graphical Track Visualization**: Renders an intuitive visual ASCII/Unicode track schematic directly in the terminal, illustrating station stops, line colors, and transfer interchange bridges.
+3. **Dynamic BMRCL Fare Engine**: Evaluates transit fares across distance slabs (₹10 to ₹60), applies the high-speed **KIAL Airport Express Corridor** surcharge, and itemizes passenger concession discounts (Smart Card, Student, Senior Citizen).
+4. **Resilient Network Management & Disruption Simulator**: Enables live maintenance toggling (closing stations or tracks for repairs) with automatic real-time rerouting around blockages via the Outer Ring Road corridor.
+5. **Data Exports (Stretch Features)**: Exports trip receipts (`exports/receipt_*.txt`), analytical turn-by-turn route logs (`exports/route_*.csv`), and full station directories (`exports/metro_network_stations.csv`).
 
 ---
 
-## 2. Bengaluru Namma Metro Network Architecture
+## 2. Clean Architecture & Project Structure
 
-The network model encompasses **63 stations** across **5 key lines** connecting all major IT corridors, residential hubs, transit terminals, and the international airport:
+The project has zero external dependencies, running out-of-the-box with standard Java 17:
+
+```
+src/
+└── com/
+    └── metromind/
+        ├── Main.java                        <-- Direct menu-driven console application
+        ├── MetroMindTest.java               <-- Automated verification suite (100% pass)
+        ├── model/
+        │   ├── MetroLine.java               <-- Enum of Namma Metro lines with transfer penalties
+        │   ├── Station.java                 <-- Vertex node with line memberships & active state
+        │   ├── Connection.java              <-- Weighted edge with distance, time & operational state
+        │   ├── TicketType.java              <-- Concession categories & discount percentages
+        │   ├── RouteSegment.java            <-- Leg of a journey on a single transit line
+        │   ├── RouteResult.java             <-- Complete itinerary, station list & transfer points
+        │   ├── FareBreakdown.java           <-- Granular itemization of fare, slabs & discounts
+        │   └── JourneySummary.java          <-- High-level receipt combining route & fare audit
+        ├── graph/
+        │   └── MetroGraph.java              <-- Adjacency-list graph data structure
+        ├── routing/
+        │   ├── PathNode.java                <-- Priority Queue state wrapper for Dijkstra
+        │   └── RouteEngine.java             <-- Best-route & multi-criteria routing algorithms
+        ├── fare/
+        │   └── FareEngine.java              <-- Distance slab resolver & concession calculator
+        ├── service/
+        │   └── MetroMindService.java        <-- Facade coordinating graph, routing & fare logic
+        └── util/
+            ├── AsciiRouteVisualizer.java    <-- Terminal graphical track map renderer
+            ├── NetworkDataInitializer.java  <-- Pre-populates 63 stations & 5 Namma Metro lines
+            ├── FileExporter.java            <-- Stretch feature: Text receipts & CSV exports
+            └── ConsoleUtils.java            <-- Terminal formatting & safe input sanitizers
+```
+
+---
+
+## 3. Bengaluru Namma Metro Network Architecture
+
+The network model encompasses **63 stations** across **5 key lines**:
 
 1. **Purple Line (East-West Corridor - Challaghatta to Whitefield)**:
    - Connects *Challaghatta, Kengeri, Mysuru Road, Vijayanagar, KSR Bengaluru Railway Station, Nadaprabhu Kempegowda Station (Majestic), Vidhana Soudha, MG Road, Indiranagar, Swami Vivekananda Road, Baiyappanahalli, KR Puram, Hoodi, Sri Sathya Sai Hospital, Whitefield (Kadugodi)*.
@@ -33,171 +69,92 @@ The network model encompasses **63 stations** across **5 key lines** connecting 
 5. **Blue Line (Outer Ring Road & Airport Express - Silk Board to KIAL Airport Terminal)**:
    - Connects *Central Silk Board, HSR Layout, Bellandur (Ecospace), Kadubeesanahalli, Marathahalli, Doddanekundi, KR Puram, Kalyan Nagar, Nagawara, Hebbal, Yeshwanthpur (ORR Connector), Yelahanka, Doddajala, KIAL Airport Terminal*.
 
-### Key Interchange Hubs in Bengaluru:
-- **Nadaprabhu Kempegowda Station, Majestic**: Mega Interchange connecting **Purple Line** and **Green Line**.
-- **MG Road**: Interchange connecting **Purple Line** and **Pink Line**.
-- **KR Puram (Krishnarajapuram)**: Major IT Hub Interchange connecting **Purple Line** and **Blue Line**.
-- **Rashtreeya Vidyalaya (RV) Road**: Interchange connecting **Green Line** and **Yellow Line**.
-- **Jayadeva Hospital**: Multi-level Interchange connecting **Yellow Line** and **Pink Line**.
-- **Central Silk Board**: Vital junction connecting **Yellow Line** and **Blue Line**.
-- **Nagawara**: Interchange connecting **Pink Line** and **Blue Line**.
-- **Yeshwanthpur / Hebbal**: Connecting **Green Line** and **Blue Line** (ORR orbital connector).
-
-```mermaid
-graph TD
-    MAJ["Majestic (Purple, Green)"]
-    MGR["MG Road (Purple, Pink)"]
-    KRP["KR Puram (Purple, Blue)"]
-    RVR["RV Road (Green, Yellow)"]
-    JYD["Jayadeva Hospital (Yellow, Pink)"]
-    CSB["Central Silk Board (Yellow, Blue)"]
-    NAG["Nagawara (Pink, Blue)"]
-    AIR["KIAL Airport Terminal (Blue)"]
-
-    MAJ ---|Purple Line| MGR
-    MGR ---|Purple Line| KRP
-    KRP ---|Purple Line| WF["Whitefield"]
-    MAJ ---|Green Line| RVR
-    RVR ---|Green Line| SI["Silk Institute"]
-    RVR ---|Yellow Line| JYD
-    JYD ---|Yellow Line| CSB
-    CSB ---|Yellow Line| EC["Electronic City"]
-    MGR ---|Pink Line| JYD
-    MGR ---|Pink Line| NAG
-    CSB ---|Blue Line ORR| KRP
-    KRP ---|Blue Line| NAG
-    NAG ---|Blue Line| HEB["Hebbal"]
-    HEB ---|Blue Line Airport| AIR
-```
+### Key Interchange Hubs:
+- **Nadaprabhu Kempegowda Station, Majestic**: Mega Interchange (Purple $\leftrightarrow$ Green).
+- **MG Road**: Central Business District Interchange (Purple $\leftrightarrow$ Pink).
+- **KR Puram (Krishnarajapuram)**: Major IT Hub Interchange (Purple $\leftrightarrow$ Blue).
+- **Rashtreeya Vidyalaya (RV) Road**: South Bengaluru Interchange (Green $\leftrightarrow$ Yellow).
+- **Jayadeva Hospital**: Multi-level Interchange (Yellow $\leftrightarrow$ Pink).
+- **Central Silk Board**: Vital Tech Junction (Yellow $\leftrightarrow$ Blue).
+- **Nagawara**: North Bengaluru Interchange (Pink $\leftrightarrow$ Blue).
+- **Yeshwanthpur / Hebbal**: Orbital ORR Connector (Green $\leftrightarrow$ Blue).
 
 ---
 
-## 3. How the Solution Works (Detailed Component Breakdown)
+## 4. How the Solution Works
 
-### 3.1 Network Modeling (Vertices and Edges)
-- **Stations (Vertices)**: Represented by `Station.java`. A station holds a name, unique ID, active status flag, and a `Set<MetroLine>`. Stations belonging to multiple lines are automatically recognized as **Interchange Hubs** (`isInterchange() == true`).
-- **Connections (Edges)**: Represented by `Connection.java`. A directed edge linking two stations with a physical distance weight (in km), travel duration weight (in minutes), the transit line it belongs to, and an operational flag.
+### 4.1 Automated Best-Route Selection
+In `RouteEngine.java`, `findBestRoute()` evaluates candidate paths across three criteria:
+- Minimum travel time (minutes)
+- Minimum line switches (interchanges)
+- Minimum physical distance (km)
 
-### 3.2 The Routing Algorithms
+It scores candidate paths using a commuter friction function:
+$$\text{Score} = \text{Travel Time} + (\text{Interchanges} \times 7.0) + (\text{Distance} \times 0.15)$$
+The route with the lowest friction score is selected as the **Best Recommended Route**.
 
-#### A. Shortest Distance Path
-- **Algorithm**: Standard **Dijkstra's Algorithm**.
-- **Edge Weight**: `edge.getDistanceKm()`.
-- **Operation**: A min-priority queue (`PriorityQueue<PathNode>`) expands the node with lowest cumulative distance. Relaxed distance values are stored in `Map<Station, Double> minCost`. When the destination station is reached, the optimal path is reconstructed backwards through `PathNode.getPrevious()`.
-- **Time Complexity**: $\mathcal{O}((V + E) \log V)$ where $V$ is stations and $E$ is tracks.
+### 4.2 Terminal Graphical Track Visualizer
+In `AsciiRouteVisualizer.java`, the system renders a text-mode graphical schematic:
+- **Corridor Overview**: High-level station-to-station chain with line names.
+- **Detailed Track Schematic**: Box-drawing elements displaying origin (`[START] *`), intermediate stops (`o`), junction markers, and transfer bridge blocks showing walking/dwell buffers.
+- **Milestone Metrics**: Total kilometers, minutes, station count, and transfers.
 
-#### B. Fastest Travel Time (with Interchange Penalties)
-- **Real-World Transit Friction**: In transit networks like Namma Metro, switching lines at interchanges (e.g. at Majestic or Silk Board) involves moving between platforms, staircases, and waiting for the next train (typically 3 to 4 minutes).
-- **Algorithm**: **State-Expanded Dijkstra's Algorithm**.
-- **State Space**: States are keyed by `(Station, CurrentLine)`.
-- **Edge Weight**: `edge.getTimeMinutes() + (lineChange ? line.getTransferPenaltyMinutes() : 0.0)`.
-- **Operation**: If `current.getCurrentLine() != edge.getLine()`, an interchange transfer penalty is automatically added.
-
-#### C. Fewest Interchanges (Line Transfer Minimization)
-- **Commuter Preference**: Passengers with luggage traveling to/from KSR Railway Station or KIAL Airport strongly prefer direct trains or minimal transfers.
-- **Algorithm**: **Lexicographical Cost Dijkstra**.
-- **Cost Formulation**:
-  $$\text{Cost} = (\text{transfers} \times 10,000) + \text{distanceKm}$$
-- **Why this works**: By scaling transfers with a large factor ($10,000$), any route with $k$ transfers strictly dominates any route with $k+1$ transfers, regardless of physical distance. Among routes with the same number of transfers, the shortest distance is selected.
-
-### 3.3 Dynamic Fare Computation Engine
-The `FareEngine.java` calculates ticket costs dynamically according to distance slabs, airport corridor surcharges, and passenger categories:
-
-#### Distance Slabs:
-| Distance Slab | Base Token Fare |
-| :--- | :--- |
-| **0.0 - 2.0 km** | ₹ 10.00 |
-| **2.1 - 5.0 km** | ₹ 20.00 |
-| **5.1 - 12.0 km** | ₹ 30.00 |
-| **12.1 - 21.0 km** | ₹ 40.00 |
-| **21.1 - 32.0 km** | ₹ 50.00 |
-| **> 32.0 km** | ₹ 60.00 |
-
-#### Corridor Surcharge:
-- **KIAL Airport Express Corridor**: Commuting to/from *KIAL Airport Terminal* adds an infrastructure surcharge of **₹ 20.00**.
-
-#### Concession Rules (`TicketType`):
-1. **Standard Token / QR Ticket**: 0% discount (Full fare).
-2. **Namma Metro Smart Card (Varshik / NCMC Peak)**: 10% discount on base fare.
-3. **Namma Metro Smart Card (Off-Peak / Weekend)**: 20% discount on base fare.
-4. **Student Concession Pass**: 25% discount on base fare.
-5. **Senior Citizen Pass**: 30% discount on base fare.
-- *Calculation Formula*:
-  $$\text{Discount Amount} = \frac{\text{Base Fare} \times \text{Discount Percentage}}{100}$$
-  $$\text{Final Fare} = \max(\text{Minimum Fare (₹10)}, (\text{Base Fare} - \text{Discount Amount}) + \text{Surcharge})$$
+### 4.3 Fare Computation Engine
+The `FareEngine.java` computes ticket costs based on distance slabs and passenger categories:
+- `0.0 - 2.0 km`: ₹ 10.00
+- `2.1 - 5.0 km`: ₹ 20.00
+- `5.1 - 12.0 km`: ₹ 30.00
+- `12.1 - 21.0 km`: ₹ 40.00
+- `21.1 - 32.0 km`: ₹ 50.00
+- `> 32.0 km`: ₹ 60.00
+- **Airport Surcharge**: +₹20.00 for journeys touching *KIAL Airport Terminal*.
+- **Concessions**: Standard Token (0%), Smart Card Peak (10%), Smart Card Off-Peak (20%), Student Pass (25%), Senior Citizen (30%).
 
 ---
 
-## 4. Verification & Core Features Checklist
+## 5. Verification Checklist
 
-| Rule Requirement | Implementation in MetroMind (Bengaluru) | Status |
+| Rule Requirement | Implementation in MetroMind | Status |
 | :--- | :--- | :--- |
-| **Language** | Pure Java (JDK 17), zero external build dependencies | **COMPLIANT** |
-| **Interface** | Menu-driven console CLI with robust input validation | **COMPLIANT** |
+| **Language** | Pure Java (JDK 17), zero external dependencies | **COMPLIANT** |
+| **Interface** | Direct menu-driven console CLI | **COMPLIANT** |
 | **Core Feature 1** | Metro Network Modeling & Station Directory (63 stations, 5 lines) | **COMPLETED** |
-| **Core Feature 2** | Shortest Route Calculation (Distance-based Dijkstra) | **COMPLETED** |
-| **Core Feature 3** | Fastest Travel Time Route (Time-based Dijkstra with transfer penalties) | **COMPLETED** |
-| **Core Feature 4** | Fewest Interchanges Route (State-expanded transfer minimization) | **COMPLETED** |
-| **Core Feature 5** | Dynamic Fare Engine (Slabs, Airport surcharge, 5 concession classes) | **COMPLETED** |
+| **Core Feature 2** | Automated Best Route Finding (Commuter friction optimization) | **COMPLETED** |
+| **Core Feature 3** | Terminal Graphical Visualization (ASCII/Unicode track map) | **COMPLETED** |
+| **Core Feature 4** | Platform Transfer Penalties (Real-world walking/waiting buffers) | **COMPLETED** |
+| **Core Feature 5** | Dynamic BMRCL Fare Engine (Slabs, Airport surcharge, concessions) | **COMPLETED** |
 | **Stretch Feature 1** | Export Journey Receipt to formatted text file (`exports/receipt_*.txt`) | **COMPLETED** |
 | **Stretch Feature 2** | Export Turn-by-Turn Route Path to analytical CSV (`exports/route_*.csv`) | **COMPLETED** |
 | **Stretch Feature 3** | Export Complete Metro Network Directory to CSV (`exports/metro_network_stations.csv`) | **COMPLETED** |
 | **Stretch Feature 4** | Station Maintenance / Disruption Simulator with live rerouting | **COMPLETED** |
-| **Automated Tests** | `MetroMindTest.java` running 8 automated unit & integration tests | **100% PASSED** |
-
----
-
-## 5. Viva / Code Review Preparation (Q&A for Evaluators)
-
-### Q1: How did you model the Bengaluru Namma Metro network in code?
-> **Answer**: "We modeled the Bengaluru Namma Metro network as an undirected, weighted graph using an adjacency list. Stations are vertices (`Station`), and physical tracks connecting adjacent stations are edges (`Connection`). The adjacency list is stored in a `Map<Station, List<Connection>>` inside `MetroGraph.java`. Each connection holds physical distance (km), travel time (minutes), and the associated `MetroLine` (Purple, Green, Yellow, Pink, Blue)."
-
-### Q2: Why did you use an Adjacency List instead of an Adjacency Matrix?
-> **Answer**: "The Bengaluru Metro network is a sparse graph: with 63 stations, each station connects to on average 2 to 4 tracks. An adjacency list consumes $\mathcal{O}(V + E)$ memory, whereas an adjacency matrix would allocate $63 \times 63 = 3969$ elements, most of which are zeroes. Additionally, exploring adjacent stations during Dijkstra takes $\mathcal{O}(\text{degree}(u))$, which is significantly faster than scanning an entire matrix row."
-
-### Q3: How does your algorithm minimize interchanges between lines like Purple, Green, and Blue?
-> **Answer**: "We expanded the state representation in `RouteEngine.java` to `(Station, CurrentLine)`. When traversing from station $u$ to station $v$, if the track's line differs from the line on which the passenger arrived, an interchange occurs. We apply a weighted cost metric: $\text{Cost} = (\text{Transfers} \times 10,000) + \text{Distance}$. The 10,000 multiplier ensures that routes with fewer transfers are prioritized, while distance breaks ties among routes with equal transfers."
-
-### Q4: How are transfer delays handled in travel time calculation?
-> **Answer**: "Each `MetroLine` defines a `transferPenaltyMinutes` (e.g. 4.0 minutes). During time-based Dijkstra, whenever a transition switches lines at an interchange hub (e.g., changing from Purple to Green Line at Majestic), the transfer penalty is added to the arrival time. This accurately simulates walking across platforms and waiting for the next train."
-
-### Q5: How does the fare computation engine work?
-> **Answer**: "The `FareEngine.java` computes fares across 6 tiered slabs (₹10 for 0-2 km up to ₹60 for >32 km). If the route utilizes the *KIAL Airport Express Corridor*, a ₹20 surcharge is applied. Concessions are then computed based on `TicketType` (10% off for Smart Card, 20% off for Off-Peak, 25% off for Students, 30% off for Senior Citizens), subject to a minimum fare floor of ₹10."
-
-### Q6: What happens if a major interchange like Majestic is closed for emergency maintenance?
-> **Answer**: "In `MetroMindService.java`, toggling a station status to inactive makes its connections non-operational. If Nadaprabhu Kempegowda Station (Majestic) is closed, Dijkstra's algorithm automatically navigates around it via the Outer Ring Road corridor (Blue Line via KR Puram, Nagawara, and Hebbal) or via Pink/Yellow line interchanges."
-
-### Q7: What are the time and space complexities of your routing engine?
-> **Answer**:
-> - **Space Complexity**: $\mathcal{O}(V + E)$ for graph representation and $\mathcal{O}(V \times L)$ for priority queue states, where $L$ is the number of distinct lines passing through stations ($L \le 5$).
-> - **Time Complexity**: $\mathcal{O}((V + E) \log V)$ for distance-based Dijkstra using a min-heap. For state-expanded time and transfer routing, it is $\mathcal{O}((V \cdot L + E) \log(V \cdot L))$. With $V = 63$, routing computes in a few milliseconds.
+| **Automated Tests** | `MetroMindTest.java` running 10 unit & integration tests | **100% PASSED** |
 
 ---
 
 ## 6. How to Compile and Run
 
-### Option 1: Using Provided Windows Batch Scripts
-- **To Compile**:
+### Option 1: Using Windows Batch Scripts
+- **Compile Project**:
   ```cmd
   compile.bat
   ```
-- **To Run the Interactive Application**:
+- **Run Interactive Application**:
   ```cmd
   run.bat
   ```
-- **To Run the Automated Test Suite**:
+- **Run Automated Verification Tests**:
   ```cmd
   test.bat
   ```
 
 ### Option 2: Using Standard CLI Commands
 ```powershell
-# Compile all Java sources
-javac -d bin src/com/metromind/*.java src/com/metromind/**/*.java
+# Compile all source files
+javac -d bin -sourcepath src src\com\metromind\Main.java src\com\metromind\MetroMindTest.java src\com\metromind\model\*.java src\com\metromind\graph\*.java src\com\metromind\routing\*.java src\com\metromind\fare\*.java src\com\metromind\service\*.java src\com\metromind\util\*.java
 
-# Launch the interactive menu application
+# Launch Console Application
 java -cp bin com.metromind.Main
 
-# Run the test suite
+# Run Automated Test Suite
 java -cp bin com.metromind.MetroMindTest
 ```

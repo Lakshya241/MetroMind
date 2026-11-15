@@ -4,13 +4,14 @@ import com.metromind.fare.FareEngine;
 import com.metromind.model.*;
 import com.metromind.routing.RouteEngine.Criteria;
 import com.metromind.service.MetroMindService;
+import com.metromind.util.AsciiRouteVisualizer;
 
 import java.io.File;
 
 /**
  * Automated Verification Suite for Bengaluru Namma Metro Engine.
- * Tests graph construction, multi-criteria routing, fare slabs,
- * corridor surcharges, disruption handling, and file export.
+ * Tests graph construction, best route optimization, graphical visualization,
+ * fare slabs, corridor surcharges, disruption handling, and file export.
  */
 public class MetroMindTest {
 
@@ -65,7 +66,7 @@ public class MetroMindTest {
             System.out.println("FAILED");
         }
 
-        // TEST 4: Multi-Line Interchange Routing (Whitefield to Lalbagh via Majestic)
+        // TEST 4: Multi-Line Interchange Route (Whitefield to Lalbagh via Majestic)
         totalTests++;
         System.out.print("[TEST 4] Multi-Line Interchange Route (Whitefield -> Lalbagh): ");
         Station lalbagh = service.getStation("Lalbagh");
@@ -79,17 +80,16 @@ public class MetroMindTest {
             System.out.println("FAILED");
         }
 
-        // TEST 5: Fare Calculation Slabs & Smart Card Discounts
+        // TEST 5: Fare Calculation Slabs & Namma Metro Discounts
         totalTests++;
         System.out.print("[TEST 5] Fare Calculation Slabs & Namma Metro Discounts: ");
-        // Whitefield to Majestic is ~24.1 km -> Slab 21.1-32.0 km -> Base ₹50
         FareBreakdown tokenFare = whitefieldToMajestic.getSelectedFare();
         FareBreakdown smartCardFare = service.getFareEngine().calculateFare(whitefieldToMajestic.getRouteResult(), TicketType.SMART_CARD);
         FareBreakdown studentFare = service.getFareEngine().calculateFare(whitefieldToMajestic.getRouteResult(), TicketType.STUDENT_PASS);
 
         boolean fareMatch = (tokenFare.getBaseFare() == 50.0) &&
-                (smartCardFare.getFinalFare() == 45.0) && // 10% off of 50 = 45
-                (studentFare.getFinalFare() == 37.5);    // 25% off of 50 = 37.5
+                (smartCardFare.getFinalFare() == 45.0) &&
+                (studentFare.getFinalFare() == 37.5);
 
         if (fareMatch) {
             System.out.println("PASSED (Token: ₹50, SmartCard: ₹45, Student: ₹37.5)");
@@ -99,7 +99,7 @@ public class MetroMindTest {
                     tokenFare.getBaseFare(), smartCardFare.getFinalFare(), studentFare.getFinalFare());
         }
 
-        // TEST 6: Airport Express Line Surcharge (Hebbal to KIAL Airport Terminal)
+        // TEST 6: Airport Line Surcharge (Hebbal to KIAL Airport Terminal)
         totalTests++;
         System.out.print("[TEST 6] Airport Line Surcharge (Hebbal -> KIAL Airport Terminal): ");
         Station hebbal = service.getStation("Hebbal");
@@ -117,25 +117,21 @@ public class MetroMindTest {
         // TEST 7: Station Disruption & Dynamic Rerouting (Close Majestic)
         totalTests++;
         System.out.print("[TEST 7] Dynamic Disruption Rerouting (Close Majestic): ");
-        // Test route from Indiranagar (Purple Line) to Rajajinagar (Green Line)
         Station indiranagar = service.getStation("Indiranagar");
         Station rajajinagar = service.getStation("Rajajinagar");
 
-        // Simulate closing Majestic for maintenance
         service.toggleStationStatus("Nadaprabhu Kempegowda Station, Majestic", false);
         JourneySummary afterClosure = service.planJourney(indiranagar, rajajinagar, Criteria.FEWEST_INTERCHANGES, TicketType.TOKEN);
-
-        // Restore Majestic
         service.toggleStationStatus("Nadaprabhu Kempegowda Station, Majestic", true);
 
         if (afterClosure.getRouteResult().isFound() && !afterClosure.getRouteResult().getPath().contains(majestic)) {
             System.out.println("PASSED (Successfully avoided closed station Majestic and rerouted via alternative lines)");
             passedTests++;
         } else {
-            System.out.println("FAILED (Path still uses Majestic or not found)");
+            System.out.println("FAILED");
         }
 
-        // TEST 8: File Export (Receipt TXT & CSV)
+        // TEST 8: File Export (Receipt .txt and Route .csv)
         totalTests++;
         System.out.print("[TEST 8] File Export (Receipt .txt and Route .csv): ");
         try {
@@ -157,13 +153,39 @@ public class MetroMindTest {
             System.out.println("FAILED with exception: " + e.getMessage());
         }
 
+        // TEST 9: Automated Best Route Optimization Engine
+        totalTests++;
+        System.out.print("[TEST 9] Automated Best Route Optimization: ");
+        JourneySummary bestTrip = service.planBestJourney(whitefield, lalbagh, TicketType.TOKEN);
+        if (bestTrip.getRouteResult().isFound() && bestTrip.getRouteResult().getTotalStations() > 0) {
+            System.out.printf("PASSED (Selected: %s | Distance: %.2f km | Time: %.1f min)\n",
+                    bestTrip.getRouteResult().getOptimizationCriteria(),
+                    bestTrip.getRouteResult().getTotalDistanceKm(),
+                    bestTrip.getRouteResult().getTotalTimeMinutes());
+            passedTests++;
+        } else {
+            System.out.println("FAILED");
+        }
+
+        // TEST 10: Terminal Graphical Visualizer
+        totalTests++;
+        System.out.print("[TEST 10] Terminal Graphical Track Schematic Rendering: ");
+        try {
+            // Verify visualizer runs without throwing any formatting or index exceptions
+            AsciiRouteVisualizer.renderGraphicalRoute(bestTrip.getRouteResult());
+            System.out.println("PASSED (Visual schematic rendered successfully)");
+            passedTests++;
+        } catch (Exception e) {
+            System.out.println("FAILED: " + e.getMessage());
+        }
+
         System.out.println("==================================================");
         System.out.printf("   TEST RESULTS: %d / %d TESTS PASSED (%.1f%%)\n",
                 passedTests, totalTests, (passedTests * 100.0 / totalTests));
         System.out.println("==================================================");
 
         if (passedTests == totalTests) {
-            System.out.println(">>> ALL TESTS PASSED! BENGALURU METRO ENGINE FULLY VERIFIED! <<<");
+            System.out.println(">>> ALL 10 TESTS PASSED! TRANSIT ENGINE FULLY VERIFIED! <<<");
         }
     }
 }

@@ -48,6 +48,25 @@ public class MetroMindService {
     }
 
     /**
+     * Plans the single Best Recommended Route for given origin, destination, and ticket type.
+     */
+    public JourneySummary planBestJourney(Station origin, Station destination, TicketType ticketType) {
+        RouteResult routeResult = routeEngine.findBestRoute(origin, destination);
+        Map<TicketType, FareBreakdown> allFares = fareEngine.calculateAllFareOptions(routeResult);
+
+        String id = "MM-" + journeyCounter.getAndIncrement();
+        JourneySummary summary = new JourneySummary(id, routeResult, allFares, ticketType);
+
+        if (routeResult.isFound()) {
+            recentJourneys.add(summary);
+            if (recentJourneys.size() > 25) {
+                recentJourneys.remove(0);
+            }
+        }
+        return summary;
+    }
+
+    /**
      * Executes journey planning for given origin, destination, optimization preference, and ticket type.
      */
     public JourneySummary planJourney(Station origin, Station destination, Criteria criteria, TicketType ticketType) {
@@ -59,7 +78,6 @@ public class MetroMindService {
 
         if (routeResult.isFound()) {
             recentJourneys.add(summary);
-            // Retain latest 25 journeys
             if (recentJourneys.size() > 25) {
                 recentJourneys.remove(0);
             }

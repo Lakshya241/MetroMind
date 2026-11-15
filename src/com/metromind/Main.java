@@ -2,16 +2,17 @@ package com.metromind;
 
 import com.metromind.fare.FareEngine;
 import com.metromind.model.*;
-import com.metromind.routing.RouteEngine.Criteria;
 import com.metromind.service.MetroMindService;
+import com.metromind.util.AsciiRouteVisualizer;
 import com.metromind.util.ConsoleUtils;
 
 import java.io.IOException;
 import java.util.*;
 
 /**
- * MetroMind: Shortest-Route and Fare Computation Engine
- * Interactive Menu-Driven Console Application.
+ * MetroMind: Bengaluru Namma Metro Transit Routing & Fare Engine
+ * Direct Menu-Driven Console Application featuring Graphical Terminal Track Visualization
+ * and Automatic Best-Route Recommendation.
  */
 public class Main {
 
@@ -25,31 +26,28 @@ public class Main {
         boolean running = true;
         while (running) {
             printMainMenu();
-            int choice = ConsoleUtils.readInt(scanner, "Select an option [1-8]: ", 1, 8);
+            int choice = ConsoleUtils.readInt(scanner, "Select an option [1-7]: ", 1, 7);
 
             switch (choice) {
                 case 1:
-                    handlePlanJourney();
+                    handleFindBestRoute();
                     break;
                 case 2:
-                    handleCompareRoutes();
-                    break;
-                case 3:
                     handleExploreNetwork();
                     break;
-                case 4:
+                case 3:
                     handleViewFareStructure();
                     break;
-                case 5:
+                case 4:
                     handleNetworkOperations();
                     break;
-                case 6:
+                case 5:
                     handleRecentJourneys();
                     break;
-                case 7:
+                case 6:
                     handleExportData();
                     break;
-                case 8:
+                case 7:
                     running = false;
                     printExitMessage();
                     break;
@@ -60,32 +58,34 @@ public class Main {
     private static void printWelcomeBanner() {
         System.out.println("================================================================================");
         System.out.println(" *           METROMIND: BENGALURU NAMMA METRO ROUTING & FARE ENGINE           *");
-        System.out.println(" *      Multi-Line Shortest-Path, Interchanges & Smart-Fare Calculator         *");
+        System.out.println(" *        Automated Best-Route Optimization & Terminal Graphical Maps         *");
         System.out.println("================================================================================");
-        System.out.println(" Initialized with " + service.getAllStations().size() + " stations across " +
-                MetroLine.values().length + " Namma Metro lines with real-time transfer penalties.");
-        System.out.println(" Operational Network: Purple Line, Green Line, Yellow Line, Pink Line, Blue Line (Airport & ORR).");
-        System.out.println(" Ready to navigate your commute across Bengaluru.\n");
+        System.out.println(" Operational Network: 63 stations across 5 Namma Metro lines:");
+        System.out.println("   [Purple Line]  Challaghatta <-> Majestic <-> Whitefield (Kadugodi)");
+        System.out.println("   [Green Line]   Madavara (BIEC) <-> Yeshwanthpur <-> Majestic <-> Silk Institute");
+        System.out.println("   [Yellow Line]  RV Road <-> Jayadeva <-> Central Silk Board <-> Electronic City");
+        System.out.println("   [Pink Line]    Kalena Agrahara <-> MG Road <-> Cantonment <-> Nagawara");
+        System.out.println("   [Blue Line]    Central Silk Board <-> Marathahalli <-> KR Puram <-> KIAL Airport");
+        System.out.println(" Ready to navigate your commute.\n");
     }
 
     private static void printMainMenu() {
         ConsoleUtils.printHeader("MAIN NAVIGATION MENU");
-        System.out.println("  [1] Plan Journey (Route Finding, Transfers & Fare Breakdown)");
-        System.out.println("  [2] Multi-Criteria Route Comparison (Shortest vs Fastest vs Transfers)");
-        System.out.println("  [3] Explore Metro Network (Lines, Stations & Interchanges)");
-        System.out.println("  [4] View Fare Structure & Concession Slabs");
-        System.out.println("  [5] Network Management & Disruption Simulation (Maintenance/Closure)");
-        System.out.println("  [6] View Recent Journey History");
-        System.out.println("  [7] Export Data (Receipts, Route CSV, Network CSV - Stretch Features)");
-        System.out.println("  [8] Exit");
+        System.out.println("  [1] Find Best Route & Visual Track Map (Graphical Schematic & Fare)");
+        System.out.println("  [2] Explore Transit Lines, Stations & Interchanges");
+        System.out.println("  [3] View Official BMRCL Fare Structure & Concession Slabs");
+        System.out.println("  [4] Network Operations Simulator (Maintenance, Station/Track Closure & Rerouting)");
+        System.out.println("  [5] View Recent Journey History");
+        System.out.println("  [6] Export Data (Receipts, Route CSV, Network CSV - Stretch Features)");
+        System.out.println("  [7] Exit");
         ConsoleUtils.printDivider();
     }
 
     // =========================================================================
-    // FEATURE 1: PLAN A JOURNEY
+    // FEATURE 1: FIND BEST ROUTE & GRAPHICAL TERMINAL VISUALIZATION
     // =========================================================================
-    private static void handlePlanJourney() {
-        ConsoleUtils.printHeader("PLAN YOUR JOURNEY");
+    private static void handleFindBestRoute() {
+        ConsoleUtils.printHeader("FIND BEST ROUTE (OPTIMAL COMMUTER PATH)");
 
         Station origin = promptSelectStation("Enter Origin Station: ");
         if (origin == null) return;
@@ -99,33 +99,60 @@ public class Main {
             return;
         }
 
-        ConsoleUtils.printSubHeader("Select Routing Preference");
-        System.out.println("  [1] Shortest Physical Distance (Minimizes track kilometers)");
-        System.out.println("  [2] Fastest Travel Time (Minimizes journey minutes + transfer buffers)");
-        System.out.println("  [3] Fewest Interchanges (Minimizes line changes/train switches)");
-        int critChoice = ConsoleUtils.readInt(scanner, "Choose preference [1-3]: ", 1, 3);
-        Criteria criteria;
-        switch (critChoice) {
-            case 2: criteria = Criteria.FASTEST_TIME; break;
-            case 3: criteria = Criteria.FEWEST_INTERCHANGES; break;
-            default: criteria = Criteria.SHORTEST_DISTANCE; break;
-        }
-
         ConsoleUtils.printSubHeader("Select Ticket / Pass Category");
         TicketType[] ticketTypes = TicketType.values();
         for (int i = 0; i < ticketTypes.length; i++) {
-            System.out.printf("  [%d] %-35s (%.0f%% discount)\n",
+            System.out.printf("  [%d] %-38s (%.0f%% discount)\n",
                     i + 1, ticketTypes[i].getTitle(), ticketTypes[i].getDiscountPercentage());
         }
         int tickChoice = ConsoleUtils.readInt(scanner, "Choose ticket type [1-" + ticketTypes.length + "]: ", 1, ticketTypes.length);
         TicketType selectedTicket = ticketTypes[tickChoice - 1];
 
-        // Execute computation
-        JourneySummary summary = service.planJourney(origin, destination, criteria, selectedTicket);
+        // Automatically compute the BEST ROUTE only!
+        JourneySummary summary = service.planBestJourney(origin, destination, selectedTicket);
         lastJourney = summary;
-        displayJourneyResult(summary);
+        RouteResult route = summary.getRouteResult();
 
-        // Prompt to export receipt
+        if (!route.isFound()) {
+            System.out.println("\n(!) No operational path found between " +
+                    origin.getName() + " and " + destination.getName() + ".");
+            System.out.println("    (Intermediate tracks or stations may be closed for maintenance).");
+            ConsoleUtils.pressEnterToContinue(scanner);
+            return;
+        }
+
+        // 1. RENDER GRAPHICAL SCHEMATIC IN TERMINAL
+        AsciiRouteVisualizer.renderGraphicalRoute(route);
+
+        // 2. DISPLAY FARE BREAKDOWN
+        ConsoleUtils.printSubHeader("Fare Computation Breakdown");
+        FareBreakdown fare = summary.getSelectedFare();
+        System.out.printf("  Selected Category    : %s\n", fare.getTicketType().getTitle());
+        System.out.printf("  Applicable Slab      : %s\n", fare.getSlabName());
+        System.out.printf("  Base Fare            : ₹%.2f\n", fare.getBaseFare());
+        if (fare.getAirportSurcharge() > 0) {
+            System.out.printf("  Airport Line Surchg. : ₹%.2f (KIAL Airport Corridor)\n", fare.getAirportSurcharge());
+        }
+        if (fare.getDiscountAmount() > 0) {
+            System.out.printf("  Discount Applied     : -₹%.2f (%.0f%% concession)\n",
+                    fare.getDiscountAmount(), fare.getTicketType().getDiscountPercentage());
+        }
+        System.out.println("  ---------------------------------------------");
+        System.out.printf("  FINAL PAYABLE AMOUNT : ₹%.2f\n", fare.getFinalFare());
+        System.out.println("  ---------------------------------------------");
+
+        // 3. COMPARISON TABLE ACROSS ALL PASSES
+        ConsoleUtils.printSubHeader("All Fare Options Comparison");
+        System.out.printf("  %-40s | %-10s | %-10s | %-10s\n", "Ticket Type", "Base", "Discount", "Payable");
+        System.out.println("  ------------------------------------------------------------------------");
+        for (Map.Entry<TicketType, FareBreakdown> entry : summary.getFareOptions().entrySet()) {
+            FareBreakdown fb = entry.getValue();
+            System.out.printf("  %-40s | ₹%-9.2f | -₹%-9.2f | ₹%-9.2f\n",
+                    entry.getKey().getTitle(), fb.getBaseFare() + fb.getAirportSurcharge(),
+                    fb.getDiscountAmount(), fb.getFinalFare());
+        }
+
+        // 4. PROMPT FOR EXPORT
         System.out.print("\nWould you like to export this journey receipt to a text file? (y/N): ");
         String ans = scanner.nextLine().trim();
         if (ans.equalsIgnoreCase("y") || ans.equalsIgnoreCase("yes")) {
@@ -140,123 +167,8 @@ public class Main {
         ConsoleUtils.pressEnterToContinue(scanner);
     }
 
-    private static void displayJourneyResult(JourneySummary summary) {
-        RouteResult route = summary.getRouteResult();
-
-        if (!route.isFound()) {
-            System.out.println("\n(!) No operational path found between " +
-                    route.getOrigin().getName() + " and " + route.getDestination().getName() + ".");
-            System.out.println("    (Tracks or intermediate stations may be currently closed for maintenance).");
-            return;
-        }
-
-        ConsoleUtils.printHeader("TRIP ITINERARY & NAVIGATION DETAILS [" + summary.getJourneyId() + "]");
-        System.out.printf("  Origin Station   : %s\n", route.getOrigin().getName());
-        System.out.printf("  Destination      : %s\n", route.getDestination().getName());
-        System.out.printf("  Strategy Used    : %s\n", route.getOptimizationCriteria());
-        System.out.printf("  Total Stations   : %d stops\n", route.getTotalStations());
-        System.out.printf("  Total Distance   : %.2f km\n", route.getTotalDistanceKm());
-        System.out.printf("  Estimated Time   : %.1f minutes\n", route.getTotalTimeMinutes());
-        System.out.printf("  Line Transfers   : %d interchange(s)\n", route.getInterchangeCount());
-
-        if (route.getInterchangeCount() > 0) {
-            System.out.print("  Interchange Hubs : ");
-            for (int i = 0; i < route.getInterchanges().size(); i++) {
-                if (i > 0) System.out.print(" -> ");
-                System.out.print(route.getInterchanges().get(i).getName());
-            }
-            System.out.println();
-        }
-
-        ConsoleUtils.printSubHeader("Step-by-Step Directions");
-        int segIndex = 1;
-        for (RouteSegment seg : route.getSegments()) {
-            System.out.printf("\n  Leg %d: Board the [%s]\n", segIndex++, seg.getLine().getDisplayName().toUpperCase());
-            System.out.printf("         From: %s  --->  To: %s\n", seg.getStartStation().getName(), seg.getEndStation().getName());
-            System.out.printf("         Stops (%d): ", seg.getStationCount());
-
-            List<Station> sts = seg.getStations();
-            for (int i = 0; i < sts.size(); i++) {
-                if (i > 0) System.out.print(" -> ");
-                System.out.print(sts.get(i).getName());
-            }
-            System.out.printf("\n         Subtotal: %.2f km | Approx. %.1f mins\n", seg.getDistanceKm(), seg.getTimeMinutes());
-        }
-
-        ConsoleUtils.printSubHeader("Fare Computation Breakdown");
-        FareBreakdown fare = summary.getSelectedFare();
-        System.out.printf("  Selected Category    : %s\n", fare.getTicketType().getTitle());
-        System.out.printf("  Applicable Slab      : %s\n", fare.getSlabName());
-        System.out.printf("  Base Fare            : ₹%.2f\n", fare.getBaseFare());
-        if (fare.getAirportSurcharge() > 0) {
-            System.out.printf("  Airport Line Surchg. : ₹%.2f\n", fare.getAirportSurcharge());
-        }
-        if (fare.getDiscountAmount() > 0) {
-            System.out.printf("  Discount Applied     : -₹%.2f (%.0f%% concession)\n",
-                    fare.getDiscountAmount(), fare.getTicketType().getDiscountPercentage());
-        }
-        System.out.println("  ---------------------------------------------");
-        System.out.printf("  FINAL PAYABLE AMOUNT : ₹%.2f\n", fare.getFinalFare());
-        System.out.println("  ---------------------------------------------");
-
-        ConsoleUtils.printSubHeader("All Fare Options Comparison");
-        System.out.printf("  %-38s | %-10s | %-10s | %-10s\n", "Ticket Type", "Base", "Discount", "Payable");
-        System.out.println("  ----------------------------------------------------------------------");
-        for (Map.Entry<TicketType, FareBreakdown> entry : summary.getFareOptions().entrySet()) {
-            FareBreakdown fb = entry.getValue();
-            System.out.printf("  %-38s | ₹%-9.2f | -₹%-9.2f | ₹%-9.2f\n",
-                    entry.getKey().getTitle(), fb.getBaseFare() + fb.getAirportSurcharge(),
-                    fb.getDiscountAmount(), fb.getFinalFare());
-        }
-    }
-
     // =========================================================================
-    // FEATURE 2: MULTI-CRITERIA ROUTE COMPARISON
-    // =========================================================================
-    private static void handleCompareRoutes() {
-        ConsoleUtils.printHeader("MULTI-CRITERIA ROUTE COMPARISON");
-        System.out.println("Evaluate all 3 routing algorithms side-by-side for your trip.\n");
-
-        Station origin = promptSelectStation("Enter Origin Station: ");
-        if (origin == null) return;
-
-        Station destination = promptSelectStation("Enter Destination Station: ");
-        if (destination == null) return;
-
-        Map<Criteria, RouteResult> results = service.compareRoutes(origin, destination);
-
-        ConsoleUtils.printSubHeader("Comparison Summary: " + origin.getName() + " -> " + destination.getName());
-        System.out.printf("  %-25s | %-12s | %-14s | %-12s | %-10s | %-10s\n",
-                "Routing Criteria", "Distance", "Estimated Time", "Interchanges", "Stops", "Token Fare");
-        System.out.println("  --------------------------------------------------------------------------------------------");
-
-        for (Map.Entry<Criteria, RouteResult> entry : results.entrySet()) {
-            Criteria crit = entry.getKey();
-            RouteResult rr = entry.getValue();
-
-            if (!rr.isFound()) {
-                System.out.printf("  %-25s | %-62s\n", crit.getLabel(), "NO PATH AVAILABLE (Check for line closures)");
-                continue;
-            }
-
-            FareBreakdown fb = service.getFareEngine().calculateFare(rr, TicketType.TOKEN);
-            System.out.printf("  %-25s | %-9.2f km | %-11.1f min | %-12d | %-10d | ₹%-9.2f\n",
-                    crit.getLabel(),
-                    rr.getTotalDistanceKm(),
-                    rr.getTotalTimeMinutes(),
-                    rr.getInterchangeCount(),
-                    rr.getTotalStations(),
-                    fb.getFinalFare());
-        }
-
-        ConsoleUtils.printDivider();
-        System.out.println("Tip: Commuters traveling with luggage often prefer 'Fewest Line Interchanges'");
-        System.out.println("     to avoid walking across interchange platforms!");
-        ConsoleUtils.pressEnterToContinue(scanner);
-    }
-
-    // =========================================================================
-    // FEATURE 3: EXPLORE METRO NETWORK
+    // FEATURE 2: EXPLORE METRO NETWORK
     // =========================================================================
     private static void handleExploreNetwork() {
         boolean back = false;
@@ -276,7 +188,7 @@ public class Main {
                     ConsoleUtils.printSubHeader("Operational Transit Lines");
                     for (MetroLine line : MetroLine.values()) {
                         List<Station> stList = service.getStationsByLine(line);
-                        System.out.printf("  * %-18s (%2d stations) - %s\n",
+                        System.out.printf("  * %-25s (%2d stations) - %s\n",
                                 line.getDisplayName(), stList.size(), line.getDescription());
                     }
                     ConsoleUtils.pressEnterToContinue(scanner);
@@ -294,7 +206,7 @@ public class Main {
                     ConsoleUtils.printSubHeader("Stations on " + chosenLine.getDisplayName() + " (" + lineStations.size() + ")");
                     for (int i = 0; i < lineStations.size(); i++) {
                         Station s = lineStations.get(i);
-                        System.out.printf("  %2d. %-28s %s %s\n",
+                        System.out.printf("  %2d. %-32s %s %s\n",
                                 i + 1, s.getName(),
                                 s.isInterchange() ? "[INTERCHANGE]" : "",
                                 s.isActive() ? "" : "[MAINTENANCE CLOSED]");
@@ -305,7 +217,7 @@ public class Main {
                     List<Station> interchanges = service.getInterchangeStations();
                     ConsoleUtils.printSubHeader("Major Interchange Junction Hubs (" + interchanges.size() + ")");
                     for (Station s : interchanges) {
-                        System.out.printf("  * %-25s -> Connecting: %s\n", s.getName(), s.getLinesString());
+                        System.out.printf("  * %-35s -> Connecting: %s\n", s.getName(), s.getLinesString());
                     }
                     ConsoleUtils.pressEnterToContinue(scanner);
                     break;
@@ -317,7 +229,7 @@ public class Main {
                     } else {
                         System.out.println("(+) Found " + matches.size() + " station(s):");
                         for (Station s : matches) {
-                            System.out.printf("  - %-25s | Lines: %s | Status: %s\n",
+                            System.out.printf("  - %-32s | Lines: %s | Status: %s\n",
                                     s.getName(), s.getLinesString(), s.isActive() ? "ACTIVE" : "CLOSED");
                         }
                     }
@@ -329,7 +241,7 @@ public class Main {
                     ConsoleUtils.printSubHeader("All Stations Directory (" + all.size() + " Total)");
                     for (int i = 0; i < all.size(); i++) {
                         Station s = all.get(i);
-                        System.out.printf("  [%2d] %-28s | Lines: %-30s | %s\n",
+                        System.out.printf("  [%2d] %-35s | Lines: %-32s | %s\n",
                                 i + 1, s.getName(), s.getLinesString(), s.isActive() ? "Active" : "Closed");
                     }
                     ConsoleUtils.pressEnterToContinue(scanner);
@@ -342,10 +254,10 @@ public class Main {
     }
 
     // =========================================================================
-    // FEATURE 4: FARE STRUCTURE & CONCESSION SLABS
+    // FEATURE 3: FARE STRUCTURE & CONCESSION SLABS
     // =========================================================================
     private static void handleViewFareStructure() {
-        ConsoleUtils.printHeader("OFFICIAL FARE COMPUTATION POLICY");
+        ConsoleUtils.printHeader("OFFICIAL BMRCL FARE COMPUTATION POLICY");
         FareEngine.Slab[] slabs = service.getFareEngine().getAllSlabs();
 
         System.out.println("1. DISTANCE SLABS & BASE PRICING:");
@@ -356,12 +268,12 @@ public class Main {
         }
 
         System.out.println("\n2. SPECIAL CORRIDOR SURCHARGES:");
-        System.out.println("   * Airport Express Line : +₹" + FareEngine.AIRPORT_SURCHARGE +
-                " surcharge applies when transit utilizes the Airport Express corridor.");
+        System.out.println("   * KIAL Airport Express Corridor : +₹" + FareEngine.AIRPORT_SURCHARGE +
+                " infrastructure surcharge applies when commuting to/from KIAL Airport Terminal.");
 
         System.out.println("\n3. PASSENGER CONCESSIONS & DISCOUNTS:");
         for (TicketType t : TicketType.values()) {
-            System.out.printf("   * %-35s : %.0f%% Discount on base fare\n", t.getTitle(), t.getDiscountPercentage());
+            System.out.printf("   * %-38s : %.0f%% Discount on base fare\n", t.getTitle(), t.getDiscountPercentage());
             System.out.printf("     %s\n", t.getDescription());
         }
 
@@ -370,7 +282,7 @@ public class Main {
     }
 
     // =========================================================================
-    // FEATURE 5: NETWORK OPERATIONS & DISRUPTION SIMULATOR
+    // FEATURE 4: NETWORK OPERATIONS & SIMULATOR
     // =========================================================================
     private static void handleNetworkOperations() {
         boolean back = false;
@@ -456,7 +368,7 @@ public class Main {
     }
 
     // =========================================================================
-    // FEATURE 6: RECENT JOURNEYS
+    // FEATURE 5: RECENT JOURNEYS
     // =========================================================================
     private static void handleRecentJourneys() {
         ConsoleUtils.printHeader("RECENT JOURNEY HISTORY");
@@ -470,8 +382,7 @@ public class Main {
         System.out.printf("  %-10s | %-19s | %-20s -> %-20s | %-8s | %-8s\n",
                 "Trip ID", "Timestamp", "Origin", "Destination", "Distance", "Fare");
         System.out.println("  ---------------------------------------------------------------------------------------------");
-        for (int i = 0; i < list.size(); i++) {
-            JourneySummary js = list.get(i);
+        for (JourneySummary js : list) {
             RouteResult rr = js.getRouteResult();
             System.out.printf("  %-10s | %-19s | %-20s -> %-20s | %-5.2f km | ₹%-7.2f\n",
                     js.getJourneyId(), js.getFormattedTimestamp(),
@@ -484,7 +395,7 @@ public class Main {
         if (!tripId.isEmpty()) {
             for (JourneySummary js : list) {
                 if (js.getJourneyId().equalsIgnoreCase(tripId)) {
-                    displayJourneyResult(js);
+                    AsciiRouteVisualizer.renderGraphicalRoute(js.getRouteResult());
                     break;
                 }
             }
@@ -553,7 +464,7 @@ public class Main {
             List<Station> matches = service.searchStations(input);
             if (matches.isEmpty()) {
                 System.out.println("(!) No station found matching '" + input + "'.");
-                System.out.println("    Tip: Type part of the name or check Option 3 to explore stations.");
+                System.out.println("    Tip: Type part of the name (e.g., 'Majestic', 'Whitefield', 'Silk Board').");
                 System.out.print("Try again? (y/N): ");
                 String retry = scanner.nextLine().trim();
                 if (!retry.equalsIgnoreCase("y") && !retry.equalsIgnoreCase("yes")) {
@@ -577,7 +488,7 @@ public class Main {
     private static void printExitMessage() {
         System.out.println("\n================================================================================");
         System.out.println(" Thank you for using MetroMind: Shortest-Route and Fare Computation Engine!      ");
-        System.out.println(" Have a safe and pleasant journey on the metro! Goodbye.                        ");
+        System.out.println(" Have a safe and pleasant journey on Namma Metro Bengaluru! Goodbye.             ");
         System.out.println("================================================================================\n");
     }
 }

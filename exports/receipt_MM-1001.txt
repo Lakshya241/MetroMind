@@ -2,7 +2,7 @@
                     METROMIND TRANSIT NAVIGATION TICKET                
 ========================================================================
 Ticket ID       : MM-1001
-Issued At       : 2026-11-15 12:08:36
+Issued At       : 2026-11-15 13:30:17
 Origin          : Whitefield (Kadugodi)
 Destination     : Nadaprabhu Kempegowda Station, Majestic
 Optimization    : Shortest Distance

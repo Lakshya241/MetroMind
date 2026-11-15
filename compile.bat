@@ -5,16 +5,12 @@ echo ===================================================
 
 if not exist "bin" mkdir bin
 if not exist "exports" mkdir exports
-if exist "sources.txt" del sources.txt
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$files = (Get-ChildItem -Path src -Filter *.java -Recurse).FullName | ForEach-Object { '\"' + $_.Replace('\', '/') + '\"' }; [System.IO.File]::WriteAllLines('sources.txt', $files)"
-
-javac -d bin @sources.txt
-if exist "sources.txt" del sources.txt
+javac -d bin -sourcepath src src\com\metromind\Main.java src\com\metromind\MetroMindTest.java src\com\metromind\model\*.java src\com\metromind\graph\*.java src\com\metromind\routing\*.java src\com\metromind\fare\*.java src\com\metromind\service\*.java src\com\metromind\util\*.java
 
 if %ERRORLEVEL% equ 0 (
     echo [SUCCESS] Compilation completed successfully!
     echo Output directory: bin\
 ) else (
-    echo [ERROR] Compilation failed.
+    echo [ERROR] Compilation failed. Please ensure JDK 17+ is installed.
 )

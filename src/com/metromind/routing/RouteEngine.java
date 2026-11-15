@@ -63,6 +63,48 @@ public class RouteEngine {
     }
 
     /**
+     * Automatically computes and returns the single Best Overall Route.
+     * Evaluates travel time, transfer convenience, and distance to pick the best commuter path.
+     */
+    public RouteResult findBestRoute(Station origin, Station destination) {
+        if (origin == null || destination == null) {
+            return RouteResult.notFound(origin, destination, "Best Route");
+        }
+
+        RouteResult timeOpt = findRoute(origin, destination, Criteria.FASTEST_TIME);
+        RouteResult transOpt = findRoute(origin, destination, Criteria.FEWEST_INTERCHANGES);
+        RouteResult distOpt = findRoute(origin, destination, Criteria.SHORTEST_DISTANCE);
+
+        RouteResult best = timeOpt;
+        double bestScore = computeFrictionScore(timeOpt);
+
+        double transScore = computeFrictionScore(transOpt);
+        if (transScore < bestScore) {
+            best = transOpt;
+            bestScore = transScore;
+        }
+
+        double distScore = computeFrictionScore(distOpt);
+        if (distScore < bestScore) {
+            best = distOpt;
+        }
+
+        if (best == null || !best.isFound()) {
+            return RouteResult.notFound(origin, destination, "Best Route");
+        }
+
+        return new RouteResult(best.getOrigin(), best.getDestination(), best.getPath(),
+                best.getConnections(), best.getSegments(), best.getInterchanges(),
+                best.getTotalDistanceKm(), best.getTotalTimeMinutes(),
+                "Best Recommended Route (" + best.getOptimizationCriteria() + ")");
+    }
+
+    private double computeFrictionScore(RouteResult r) {
+        if (r == null || !r.isFound()) return Double.MAX_VALUE;
+        return r.getTotalTimeMinutes() + (r.getInterchangeCount() * 7.0) + (r.getTotalDistanceKm() * 0.15);
+    }
+
+    /**
      * Finds the route minimizing total physical kilometers.
      */
     private RouteResult dijkstraDistance(Station origin, Station destination) {

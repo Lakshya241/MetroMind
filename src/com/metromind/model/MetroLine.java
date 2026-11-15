@@ -1,8 +1,5 @@
 package com.metromind.model;
 
-/**
- * Represents a transit line in the Bengaluru Namma Metro network.
- */
 public enum MetroLine {
     PURPLE("Purple Line", "Challaghatta - Majestic - Indiranagar - Whitefield", 4.0),
     GREEN("Green Line", "Madavara (BIEC) - Yeshwanthpur - Majestic - Silk Institute", 4.0),

@@ -33,6 +33,9 @@ public class ConsoleUtils {
     public static int readInt(Scanner scanner, String prompt, int min, int max) {
         while (true) {
             System.out.print(prompt);
+            if (!scanner.hasNextLine()) {
+                return min;
+            }
             String input = scanner.nextLine().trim();
             try {
                 int value = Integer.parseInt(input);
@@ -49,6 +52,9 @@ public class ConsoleUtils {
     public static double readDouble(Scanner scanner, String prompt, double min, double max) {
         while (true) {
             System.out.print(prompt);
+            if (!scanner.hasNextLine()) {
+                return min;
+            }
             String input = scanner.nextLine().trim();
             try {
                 double value = Double.parseDouble(input);
@@ -65,6 +71,9 @@ public class ConsoleUtils {
     public static String readNonEmptyString(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
+            if (!scanner.hasNextLine()) {
+                return "";
+            }
             String line = scanner.nextLine().trim();
             if (!line.isEmpty()) {
                 return line;
@@ -75,6 +84,8 @@ public class ConsoleUtils {
 
     public static void pressEnterToContinue(Scanner scanner) {
         System.out.print("\nPress [Enter] to return to the menu...");
-        scanner.nextLine();
+        if (scanner.hasNextLine()) {
+            scanner.nextLine();
+        }
     }
 }

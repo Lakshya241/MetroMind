@@ -7,19 +7,12 @@ import com.metromind.model.TicketType;
 import java.util.EnumMap;
 import java.util.Map;
 
-/**
- * Intelligent Fare Computation Engine.
- * Computes transit fares using distance-based slabs,
- * corridor-specific surcharges (e.g. Airport Express), and ticket concession rules.
- */
+
 public class FareEngine {
 
     public static final double AIRPORT_SURCHARGE = 20.0;
     public static final double MINIMUM_FARE = 10.0;
 
-    /**
-     * Represents a distance fare slab.
-     */
     public static class Slab {
         private final double minKm;
         private final double maxKm;
@@ -59,9 +52,6 @@ public class FareEngine {
             new Slab(32.0, Double.MAX_VALUE, 60.0, "> 32.0 km")
     };
 
-    /**
-     * Calculates the fare for a given route and ticket type.
-     */
     public FareBreakdown calculateFare(RouteResult route, TicketType ticketType) {
         if (route == null || !route.isFound() || route.getPath().size() <= 1) {
             return new FareBreakdown(0.0, "Same Station", 0.0, 0.0, ticketType, 0.0, 0.0);
@@ -71,10 +61,8 @@ public class FareEngine {
         Slab matchedSlab = getSlabForDistance(distance);
         double baseFare = matchedSlab.fare;
 
-        // Corridor surcharge (e.g. Airport Express Line)
         double airportSurcharge = route.usesAirportExpress() ? AIRPORT_SURCHARGE : 0.0;
 
-        // Discount calculation
         double discountPercent = ticketType.getDiscountPercentage();
         double discountAmount = (baseFare * discountPercent) / 100.0;
 
@@ -85,9 +73,6 @@ public class FareEngine {
                 ticketType, discountAmount, finalFare);
     }
 
-    /**
-     * Computes all fare variations across available ticket and card types.
-     */
     public Map<TicketType, FareBreakdown> calculateAllFareOptions(RouteResult route) {
         Map<TicketType, FareBreakdown> options = new EnumMap<>(TicketType.class);
         for (TicketType type : TicketType.values()) {
@@ -96,9 +81,6 @@ public class FareEngine {
         return options;
     }
 
-    /**
-     * Resolves the matching distance slab.
-     */
     public Slab getSlabForDistance(double distanceKm) {
         for (Slab slab : SLABS) {
             if (distanceKm <= slab.maxKm) {
