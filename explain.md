@@ -2,6 +2,8 @@
 
 > **Who is this for?** Anyone who knows basic Java (variables, loops, classes) but hasn't yet studied data structures or algorithms in depth. We're going to walk through every part of MetroMind — what it does, why it's built the way it is, and what computer-science ideas power it.
 
+[📖 Main Project README](README.md) • [🎓 Viva & DSA Defense Guide](viva_dsa_guide.md)
+
 ---
 
 # Part 1: Understanding the Project

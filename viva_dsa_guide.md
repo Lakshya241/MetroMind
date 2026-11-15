@@ -1,12 +1,14 @@
 # MetroMind: Algorithms, Data Structures (DSA) & Viva Defense Guide
 ## Project Code: CP-042 | Bengaluru Namma Metro Edition (BMRCL)
 
+[📖 Main Project README](README.md) • [📘 Beginner's Guide (explain.md)](explain.md)
+
 ---
 
 ## 1. Core Algorithms Used
 
 ### 1.1 Automated Best-Route Optimization Algorithm
-* **File Reference**: [`RouteEngine.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/src/route/RouteEngine.java) $\rightarrow$ `findBestRoute()`
+* **File Reference**: [`RouteEngine.java`](src/route/RouteEngine.java) $\rightarrow$ `findBestRoute()`
 * **Purpose**: Automatically evaluates, scores, and delivers the single **Best Recommended Route** for the commuter without requiring them to decipher complex algorithmic choices.
 * **Mechanism**:
   - Computes candidate paths across three dimensions:
@@ -20,7 +22,7 @@
 ---
 
 ### 1.2 Dijkstra’s Algorithm (Shortest Physical Distance)
-* **File Reference**: [`RouteEngine.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/src/route/RouteEngine.java) $\rightarrow$ `dijkstraDistance()`
+* **File Reference**: [`RouteEngine.java`](src/route/RouteEngine.java) $\rightarrow$ `dijkstraDistance()`
 * **Purpose**: Computes the optimal path minimizing total track kilometers.
 * **Mechanism**:
   - Uses a **Min-Priority Queue** (`PriorityQueue<PathNode>`) to greedily select the station with the smallest known cumulative distance.
@@ -32,7 +34,7 @@
 ---
 
 ### 1.3 State-Expanded Dijkstra’s Algorithm (Fastest Travel Time)
-* **File Reference**: [`RouteEngine.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/src/route/RouteEngine.java) $\rightarrow$ `dijkstraTime()`
+* **File Reference**: [`RouteEngine.java`](src/route/RouteEngine.java) $\rightarrow$ `dijkstraTime()`
 * **Purpose**: Finds the fastest route in minutes, accurately modeling the physical delay of switching trains at interchange stations (e.g., *Majestic*, *MG Road*, or *Central Silk Board*).
 * **The Problem with Standard Graphs**: Arriving at an interchange station on one line and staying on that same line incurs $0$ transfer delay. Switching lines requires walking between platforms, staircases, and waiting for the connecting train ($+4.0$ minutes). Standard graphs cannot represent this because nodes only represent stations, not line transitions.
 * **Mechanism**:
@@ -45,7 +47,7 @@
 ---
 
 ### 1.4 Lexicographical Multi-Criteria Optimization (Fewest Interchanges)
-* **File Reference**: [`RouteEngine.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/src/route/RouteEngine.java) $\rightarrow$ `dijkstraFewestInterchanges()`
+* **File Reference**: [`RouteEngine.java`](src/route/RouteEngine.java) $\rightarrow$ `dijkstraFewestInterchanges()`
 * **Purpose**: Prioritizes minimizing platform transfers for passengers with luggage or during peak hours.
 * **Mechanism**:
   - Employs a composite priority function:
@@ -56,7 +58,7 @@
 ---
 
 ### 1.5 Terminal Graphical Route Rendering Algorithm
-* **File Reference**: [`AsciiRouteVisualizer.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/src/util/AsciiRouteVisualizer.java) $\rightarrow$ `renderGraphicalRoute()`
+* **File Reference**: [`AsciiRouteVisualizer.java`](src/util/AsciiRouteVisualizer.java) $\rightarrow$ `renderGraphicalRoute()`
 * **Purpose**: Generates an intuitive ASCII/Unicode schematic diagram directly in the console.
 * **Mechanism**:
   - Scans sequential segments and edge connections.
@@ -67,7 +69,7 @@
 ---
 
 ### 1.6 Slab-Based Range Resolution Algorithm
-* **File Reference**: [`FareEngine.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/src/fare/FareEngine.java) $\rightarrow$ `getSlabForDistance()`
+* **File Reference**: [`FareEngine.java`](src/fare/FareEngine.java) $\rightarrow$ `getSlabForDistance()`
 * **Mechanism**:
   - Matches cumulative distance against BMRCL distance slabs:
     $$[0.0 - 2.0\text{ km}], [2.1 - 5.0\text{ km}], [5.1 - 12.0\text{ km}], [12.1 - 21.0\text{ km}], [21.1 - 32.0\text{ km}], [> 32.0\text{ km}]$$

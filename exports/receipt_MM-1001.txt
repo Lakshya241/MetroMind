@@ -2,26 +2,26 @@
                     METROMIND TRANSIT NAVIGATION TICKET                
 ========================================================================
 Ticket ID       : MM-1001
-Issued At       : 2026-11-15 17:04:23
-Origin          : Jayadeva Hospital
-Destination     : MG Road
-Optimization    : Best Recommended Route (Fastest Travel Time)
+Issued At       : 2026-11-15 17:17:59
+Origin          : Whitefield (Kadugodi)
+Destination     : Nadaprabhu Kempegowda Station, Majestic
+Optimization    : Shortest Distance
 ------------------------------------------------------------------------
-Total Stations  : 5 stops
-Total Distance  : 6.90 km
-Estimated Time  : 10.5 minutes
+Total Stations  : 11 stops
+Total Distance  : 22.80 km
+Estimated Time  : 34.5 minutes
 Interchanges    : 0 line switches
 ------------------------------------------------------------------------
 JOURNEY ITINERARY SEGMENTS:
-  [1] Line: Pink Line       | From: Jayadeva Hospital    -> To: MG Road             
-      Stops: 5  | Distance: 6.90   km | Time: 10.5  min
+  [1] Line: Purple Line     | From: Whitefield (Kadugodi) -> To: Nadaprabhu Kempegowda Station, Majestic
+      Stops: 11 | Distance: 22.80  km | Time: 34.5  min
 ------------------------------------------------------------------------
 FARE COMPUTATION AUDIT:
-Ticket Category : Namma Metro Smart Card (Off-Peak / Weekend)
-Distance Slab   : 5.1 - 12.0 km
-Base Fare       : INR 30.00
-Concession/Disc : - INR 6.00 (20%)
-TOTAL PAYABLE   : INR 24.00
+Ticket Category : Standard Token / QR Ticket
+Distance Slab   : 21.1 - 32.0 km
+Base Fare       : INR 50.00
+Concession/Disc : - INR 0.00 (0%)
+TOTAL PAYABLE   : INR 50.00
 ========================================================================
            Thank you for choosing MetroMind Rapid Transit!              
 ========================================================================
