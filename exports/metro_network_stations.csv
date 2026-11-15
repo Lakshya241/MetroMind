@@ -1,0 +1,64 @@
+StationID,StationName,Lines,IsInterchange,IsActive
+"PL11","Baiyappanahalli","Purple Line",NO,ACTIVE
+"GL14","Banashankari","Green Line",NO,ACTIVE
+"BL03","Bellandur (Ecospace)","Blue Line (Airport & ORR)",NO,ACTIVE
+"PK08","Bengaluru Cantonment","Pink Line",NO,ACTIVE
+"YL06","Bommanahalli","Yellow Line",NO,ACTIVE
+"YL11","Bommasandra","Yellow Line",NO,ACTIVE
+"YL04","BTM Layout","Yellow Line",NO,ACTIVE
+"YL05","Central Silk Board","Yellow Line, Blue Line (Airport & ORR)",YES,ACTIVE
+"PL01","Challaghatta","Purple Line",NO,ACTIVE
+"GL08","Chickpet","Green Line",NO,ACTIVE
+"PK04","Dairy Circle","Pink Line",NO,ACTIVE
+"BL11","Doddajala","Blue Line (Airport & ORR)",NO,ACTIVE
+"BL06","Doddanekundi","Blue Line (Airport & ORR)",NO,ACTIVE
+"YL09","Electronic City","Yellow Line",NO,ACTIVE
+"PL13","Garudacharpalya","Purple Line",NO,ACTIVE
+"BL09","Hebbal","Blue Line (Airport & ORR)",NO,ACTIVE
+"PL14","Hoodi","Purple Line",NO,ACTIVE
+"BL02","HSR Layout","Blue Line (Airport & ORR)",NO,ACTIVE
+"PK02","IIM Bangalore","Pink Line",NO,ACTIVE
+"PL09","Indiranagar","Purple Line",NO,ACTIVE
+"YL10","Infosys Foundation Konappana","Yellow Line",NO,ACTIVE
+"YL03","Jayadeva Hospital","Yellow Line, Pink Line",YES,ACTIVE
+"GL12","Jayanagar","Green Line",NO,ACTIVE
+"GL15","JP Nagar","Green Line",NO,ACTIVE
+"PK03","JP Nagar 4th Phase","Pink Line",NO,ACTIVE
+"BL04","Kadubeesanahalli","Blue Line (Airport & ORR)",NO,ACTIVE
+"PK01","Kalena Agrahara","Pink Line",NO,ACTIVE
+"BL08","Kalyan Nagar","Blue Line (Airport & ORR)",NO,ACTIVE
+"PL02","Kengeri","Purple Line",NO,ACTIVE
+"BL12","KIAL Airport Terminal","Blue Line (Airport & ORR)",NO,ACTIVE
+"PL12","KR Puram","Blue Line (Airport & ORR), Purple Line",YES,ACTIVE
+"GL09","Krishna Rajendra Market","Green Line",NO,ACTIVE
+"PL05","KSR Bengaluru Railway Station","Purple Line",NO,ACTIVE
+"YL07","Kudlu Gate","Yellow Line",NO,ACTIVE
+"PK05","Lakkasandra","Pink Line",NO,ACTIVE
+"GL10","Lalbagh","Green Line",NO,ACTIVE
+"PK06","Langford Town","Pink Line",NO,ACTIVE
+"GL01","Madavara (BIEC)","Green Line",NO,ACTIVE
+"GL07","Mantri Square Sampige Road","Green Line",NO,ACTIVE
+"BL05","Marathahalli","Blue Line (Airport & ORR)",NO,ACTIVE
+"PL08","MG Road","Purple Line, Pink Line",YES,ACTIVE
+"PL03","Mysuru Road","Purple Line",NO,ACTIVE
+"PL06","Nadaprabhu Kempegowda Station, Majestic","Purple Line, Green Line",YES,ACTIVE
+"GL02","Nagasandra","Green Line",NO,ACTIVE
+"PK10","Nagawara","Blue Line (Airport & ORR), Pink Line",YES,ACTIVE
+"GL03","Peenya Industry","Green Line",NO,ACTIVE
+"YL02","Ragigudda","Yellow Line",NO,ACTIVE
+"GL06","Rajajinagar","Green Line",NO,ACTIVE
+"GL13","Rashtreeya Vidyalaya (RV) Road","Yellow Line, Green Line",YES,ACTIVE
+"GL05","Sandal Soap Factory","Green Line",NO,ACTIVE
+"PK07","Shivaji Nagar","Pink Line",NO,ACTIVE
+"GL17","Silk Institute","Green Line",NO,ACTIVE
+"YL08","Singasandra","Yellow Line",NO,ACTIVE
+"GL11","South End Circle","Green Line",NO,ACTIVE
+"PL15","Sri Sathya Sai Hospital","Purple Line",NO,ACTIVE
+"PL10","Swami Vivekananda Road","Purple Line",NO,ACTIVE
+"PK09","Tannery Road","Pink Line",NO,ACTIVE
+"PL07","Vidhana Soudha","Purple Line",NO,ACTIVE
+"PL04","Vijayanagar","Purple Line",NO,ACTIVE
+"PL16","Whitefield (Kadugodi)","Purple Line",NO,ACTIVE
+"GL16","Yelachenahalli","Green Line",NO,ACTIVE
+"BL10","Yelahanka","Blue Line (Airport & ORR)",NO,ACTIVE
+"GL04","Yeshwanthpur","Blue Line (Airport & ORR), Green Line",YES,ACTIVE

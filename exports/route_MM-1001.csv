@@ -1,0 +1,12 @@
+StepNumber,StationName,Line,InterchangeStatus,DistanceKmFromPrevious,TimeMinFromPrevious
+1,"Whitefield (Kadugodi)",Purple Line,NO,0.00,0.0
+2,"Sri Sathya Sai Hospital","Purple Line",NO,2.50,3.5
+3,"Hoodi","Purple Line",NO,2.10,3.0
+4,"Garudacharpalya","Purple Line",NO,2.40,3.5
+5,"KR Puram","Purple Line",YES,2.60,4.0
+6,"Baiyappanahalli","Purple Line",NO,3.20,4.5
+7,"Swami Vivekananda Road","Purple Line",NO,1.50,2.5
+8,"Indiranagar","Purple Line",NO,1.10,2.0
+9,"MG Road","Purple Line",YES,3.40,5.0
+10,"Vidhana Soudha","Purple Line",NO,2.20,3.5
+11,"Nadaprabhu Kempegowda Station, Majestic","Purple Line",YES,1.80,3.0

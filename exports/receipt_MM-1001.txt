@@ -1,0 +1,27 @@
+========================================================================
+                    METROMIND TRANSIT NAVIGATION TICKET                
+========================================================================
+Ticket ID       : MM-1001
+Issued At       : 2026-11-15 12:08:36
+Origin          : Whitefield (Kadugodi)
+Destination     : Nadaprabhu Kempegowda Station, Majestic
+Optimization    : Shortest Distance
+------------------------------------------------------------------------
+Total Stations  : 11 stops
+Total Distance  : 22.80 km
+Estimated Time  : 34.5 minutes
+Interchanges    : 0 line switches
+------------------------------------------------------------------------
+JOURNEY ITINERARY SEGMENTS:
+  [1] Line: Purple Line     | From: Whitefield (Kadugodi) -> To: Nadaprabhu Kempegowda Station, Majestic
+      Stops: 11 | Distance: 22.80  km | Time: 34.5  min
+------------------------------------------------------------------------
+FARE COMPUTATION AUDIT:
+Ticket Category : Standard Token / QR Ticket
+Distance Slab   : 21.1 - 32.0 km
+Base Fare       : INR 50.00
+Concession/Disc : - INR 0.00 (0%)
+TOTAL PAYABLE   : INR 50.00
+========================================================================
+           Thank you for choosing MetroMind Rapid Transit!              
+========================================================================
