@@ -1,8 +1,10 @@
-package com.metromind.model;
+package model;
 
 import java.io.Serializable;
 
-
+/**
+ * Encapsulates the complete fare audit and calculation breakdown.
+ */
 public class FareBreakdown implements Serializable {
     private static final long serialVersionUID = 1L;
 

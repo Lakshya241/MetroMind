@@ -1,8 +1,11 @@
-package com.metromind.model;
+package model;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents a direct track connection (edge) between two adjacent stations.
+ */
 public class Connection implements Serializable {
     private static final long serialVersionUID = 1L;
 

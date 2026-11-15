@@ -1,12 +1,12 @@
-package com.metromind.service;
+package service;
 
-import com.metromind.fare.FareEngine;
-import com.metromind.graph.MetroGraph;
-import com.metromind.model.*;
-import com.metromind.routing.RouteEngine;
-import com.metromind.routing.RouteEngine.Criteria;
-import com.metromind.util.FileExporter;
-import com.metromind.util.NetworkDataInitializer;
+import fare.FareEngine;
+import graph.MetroGraph;
+import model.*;
+import route.RouteEngine;
+import route.RouteEngine.Criteria;
+import util.FileExporter;
+import util.NetworkDataInitializer;
 
 import java.io.IOException;
 import java.util.*;

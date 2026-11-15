@@ -1,10 +1,9 @@
-package com.metromind;
-
-import com.metromind.fare.FareEngine;
-import com.metromind.model.*;
-import com.metromind.service.MetroMindService;
-import com.metromind.util.AsciiRouteVisualizer;
-import com.metromind.util.ConsoleUtils;
+import fare.FareEngine;
+import graph.MetroGraph;
+import model.*;
+import service.MetroMindService;
+import util.AsciiRouteVisualizer;
+import util.ConsoleUtils;
 
 import java.io.IOException;
 import java.util.*;

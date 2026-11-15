@@ -1,10 +1,13 @@
-package com.metromind.model;
+package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Encapsulates the complete computed path from an origin to a destination station.
+ */
 public class RouteResult implements Serializable {
     private static final long serialVersionUID = 1L;
 

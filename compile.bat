@@ -6,7 +6,7 @@ echo ===================================================
 if not exist "bin" mkdir bin
 if not exist "exports" mkdir exports
 
-javac -d bin -sourcepath src src\com\metromind\Main.java src\com\metromind\MetroMindTest.java src\com\metromind\model\*.java src\com\metromind\graph\*.java src\com\metromind\routing\*.java src\com\metromind\fare\*.java src\com\metromind\service\*.java src\com\metromind\util\*.java
+javac -d bin -sourcepath src src\Main.java src\MetroMindTest.java src\model\*.java src\graph\*.java src\route\*.java src\fare\*.java src\service\*.java src\util\*.java
 
 if %ERRORLEVEL% equ 0 (
     echo [SUCCESS] Compilation completed successfully!

@@ -1,10 +1,13 @@
-package com.metromind.model;
+package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents a continuous leg of a journey traversed on a single Metro Line.
+ */
 public class RouteSegment implements Serializable {
     private static final long serialVersionUID = 1L;
 

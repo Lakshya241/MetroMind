@@ -1,8 +1,8 @@
-package com.metromind.util;
+package util;
 
-import com.metromind.graph.MetroGraph;
-import com.metromind.model.MetroLine;
-import com.metromind.model.Station;
+import graph.MetroGraph;
+import model.MetroLine;
+import model.Station;
 
 /**
  * Pre-configures an authentic Bengaluru Namma Metro transit network

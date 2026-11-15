@@ -1,7 +1,7 @@
-package com.metromind.routing;
+package route;
 
-import com.metromind.graph.MetroGraph;
-import com.metromind.model.*;
+import graph.MetroGraph;
+import model.*;
 
 import java.util.*;
 

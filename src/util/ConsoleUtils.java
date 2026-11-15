@@ -1,4 +1,4 @@
-package com.metromind.util;
+package util;
 
 import java.util.Scanner;
 

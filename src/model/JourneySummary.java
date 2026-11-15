@@ -1,10 +1,14 @@
-package com.metromind.model;
+package model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+/**
+ * Complete summary representing a passenger's journey plan,
+ * routing specifics, and fare calculations across various ticket types.
+ */
 public class JourneySummary implements Serializable {
     private static final long serialVersionUID = 1L;
 

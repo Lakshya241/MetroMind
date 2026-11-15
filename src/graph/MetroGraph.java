@@ -1,8 +1,8 @@
-package com.metromind.graph;
+package graph;
 
-import com.metromind.model.Connection;
-import com.metromind.model.MetroLine;
-import com.metromind.model.Station;
+import model.Connection;
+import model.MetroLine;
+import model.Station;
 
 import java.io.Serializable;
 import java.util.*;

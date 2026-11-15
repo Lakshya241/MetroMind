@@ -1,8 +1,8 @@
-package com.metromind.routing;
+package route;
 
-import com.metromind.model.Connection;
-import com.metromind.model.MetroLine;
-import com.metromind.model.Station;
+import model.Connection;
+import model.MetroLine;
+import model.Station;
 
 /**
  * Node state utilized by the Dijkstra / Priority Queue pathfinding algorithms.

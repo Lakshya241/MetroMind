@@ -1,7 +1,7 @@
 @echo off
-if not exist "bin\com\metromind\MetroMindTest.class" (
+if not exist "bin\MetroMindTest.class" (
     echo Binaries not found. Compiling first...
     call compile.bat
 )
-java -cp bin com.metromind.MetroMindTest
+java -cp bin MetroMindTest
 pause

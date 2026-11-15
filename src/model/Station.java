@@ -1,4 +1,4 @@
-package com.metromind.model;
+package model;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -6,6 +6,10 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Represents an individual metro station.
+ * A station may connect to one or multiple lines (Interchange station).
+ */
 public class Station implements Serializable, Comparable<Station> {
     private static final long serialVersionUID = 1L;
 

@@ -1,10 +1,10 @@
-package com.metromind.util;
+package util;
 
-import com.metromind.model.Connection;
-import com.metromind.model.MetroLine;
-import com.metromind.model.RouteResult;
-import com.metromind.model.RouteSegment;
-import com.metromind.model.Station;
+import model.Connection;
+import model.MetroLine;
+import model.RouteResult;
+import model.RouteSegment;
+import model.Station;
 
 import java.util.List;
 

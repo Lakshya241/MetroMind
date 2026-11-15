@@ -1,12 +1,11 @@
-package com.metromind.fare;
+package fare;
 
-import com.metromind.model.FareBreakdown;
-import com.metromind.model.RouteResult;
-import com.metromind.model.TicketType;
+import model.FareBreakdown;
+import model.RouteResult;
+import model.TicketType;
 
 import java.util.EnumMap;
 import java.util.Map;
-
 
 public class FareEngine {
 

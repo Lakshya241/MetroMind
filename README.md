@@ -48,13 +48,13 @@ MetroMind is a high-performance transit navigation and automated fare auditing e
 ### Manual Compilation & Execution
 ```bash
 # Compile all source files
-javac -d bin -sourcepath src src\com\metromind\Main.java src\com\metromind\MetroMindTest.java src\com\metromind\model\*.java src\com\metromind\graph\*.java src\com\metromind\routing\*.java src\com\metromind\fare\*.java src\com\metromind\service\*.java src\com\metromind\util\*.java
+javac -d bin -sourcepath src src\Main.java src\MetroMindTest.java src\model\*.java src\graph\*.java src\route\*.java src\fare\*.java src\service\*.java src\util\*.java
 
 # Run Console Application
-java -cp bin com.metromind.Main
+java -cp bin Main
 
 # Run Automated Test Suite
-java -cp bin com.metromind.MetroMindTest
+java -cp bin MetroMindTest
 ```
 
 ---

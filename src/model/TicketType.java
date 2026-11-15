@@ -1,6 +1,8 @@
-package com.metromind.model;
+package model;
 
-
+/**
+ * Supported ticket and pass types for Bengaluru Namma Metro fare calculation.
+ */
 public enum TicketType {
     TOKEN("Standard Token / QR Ticket", 0.0, "Standard single journey token with full fare."),
     SMART_CARD("Namma Metro Smart Card (Varshik / NCMC)", 10.0, "Rechargeable smart card offering 10% discount on base fare."),
