@@ -29,7 +29,7 @@ StationID,StationName,Lines,IsInterchange,IsActive
 "BL08","Kalyan Nagar","Blue Line (Airport & ORR)",NO,ACTIVE
 "PL02","Kengeri","Purple Line",NO,ACTIVE
 "BL12","KIAL Airport Terminal","Blue Line (Airport & ORR)",NO,ACTIVE
-"PL12","KR Puram","Blue Line (Airport & ORR), Purple Line",YES,ACTIVE
+"PL12","KR Puram","Purple Line, Blue Line (Airport & ORR)",YES,ACTIVE
 "GL09","Krishna Rajendra Market","Green Line",NO,ACTIVE
 "PL05","KSR Bengaluru Railway Station","Purple Line",NO,ACTIVE
 "YL07","Kudlu Gate","Yellow Line",NO,ACTIVE
@@ -43,7 +43,7 @@ StationID,StationName,Lines,IsInterchange,IsActive
 "PL03","Mysuru Road","Purple Line",NO,ACTIVE
 "PL06","Nadaprabhu Kempegowda Station, Majestic","Purple Line, Green Line",YES,ACTIVE
 "GL02","Nagasandra","Green Line",NO,ACTIVE
-"PK10","Nagawara","Blue Line (Airport & ORR), Pink Line",YES,ACTIVE
+"PK10","Nagawara","Pink Line, Blue Line (Airport & ORR)",YES,ACTIVE
 "GL03","Peenya Industry","Green Line",NO,ACTIVE
 "YL02","Ragigudda","Yellow Line",NO,ACTIVE
 "GL06","Rajajinagar","Green Line",NO,ACTIVE
@@ -61,4 +61,4 @@ StationID,StationName,Lines,IsInterchange,IsActive
 "PL16","Whitefield (Kadugodi)","Purple Line",NO,ACTIVE
 "GL16","Yelachenahalli","Green Line",NO,ACTIVE
 "BL10","Yelahanka","Blue Line (Airport & ORR)",NO,ACTIVE
-"GL04","Yeshwanthpur","Blue Line (Airport & ORR), Green Line",YES,ACTIVE
+"GL04","Yeshwanthpur","Green Line, Blue Line (Airport & ORR)",YES,ACTIVE
