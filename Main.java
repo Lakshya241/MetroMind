@@ -1337,13 +1337,13 @@ class FileExporter {
             writer.write("FARE COMPUTATION AUDIT:\n");
             writer.write(String.format("Ticket Category : %s\n", fare.getTicketType().getTitle()));
             writer.write(String.format("Distance Slab   : %s\n", fare.getSlabName()));
-            writer.write(String.format("Base Fare       : INR %.2f\n", fare.getBaseFare()));
+            writer.write(String.format("Base Fare       : ₹%.2f\n", fare.getBaseFare()));
             if (fare.getAirportSurcharge() > 0) {
-                writer.write(String.format("Airport Surcharge: INR %.2f\n", fare.getAirportSurcharge()));
+                writer.write(String.format("Airport Surcharge: ₹%.2f\n", fare.getAirportSurcharge()));
             }
-            writer.write(String.format("Concession/Disc : - INR %.2f (%.0f%%)\n",
+            writer.write(String.format("Concession/Disc : -₹%.2f (%.0f%%)\n",
                     fare.getDiscountAmount(), fare.getTicketType().getDiscountPercentage()));
-            writer.write(String.format("TOTAL PAYABLE   : INR %.2f\n", fare.getFinalFare()));
+            writer.write(String.format("TOTAL PAYABLE   : ₹%.2f\n", fare.getFinalFare()));
             writer.write("========================================================================\n");
             writer.write("           Thank you for choosing MetroMind Rapid Transit!              \n");
             writer.write("========================================================================\n");

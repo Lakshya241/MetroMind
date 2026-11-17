@@ -7,9 +7,11 @@
 
 **MetroMind** is an automated transit pathfinding, dynamic fare auditing, and terminal graphical track visualization engine built in Java. It models the real-world **Bengaluru Namma Metro (BMRCL)** rapid transit network (63 stations across 5 lines).
 
+All currency calculations and fare specifications throughout the system are measured strictly in **Indian Rupees (₹)**.
+
 The codebase is split into two cleanly decoupled files:
 1. **[`MetroDSA.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/MetroDSA.java)**: The **Data Structures & Algorithms (DSA)** core. Houses the graph representation, adjacency list, Priority Queue node models, pathfinding algorithms (Dijkstra variants), commuter friction cost heuristics, and route reconstruction.
-2. **[`Main.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/Main.java)**: The **Application & Presentation** layer. Houses the interactive console menus, BMRCL distance slab & concession fare computation, network initialization, ASCII track schematic visualizer, receipt/CSV exporters, and automated self-verification test suite.
+2. **[`Main.java`](file:///c:/Users/laksh/OneDrive/Desktop/New%20folder%20(6)/Main.java)**: The **Application & Presentation** layer. Houses the interactive console menus, BMRCL distance slab & concession fare computation (in ₹), network initialization, ASCII track schematic visualizer, receipt/CSV exporters, and automated self-verification test suite.
 
 ---
 
@@ -39,9 +41,9 @@ New folder (6)/
 |  - Main Menu & Input Sanitization (ConsoleUtils)                         |
 |  - MetroMindService (Facade coordinating operations & history)           |
 |  - NetworkDataInitializer (Initializes 63 Namma Metro stations & tracks) |
-|  - FareEngine & FareBreakdown (BMRCL distance slabs & concessions)       |
+|  - FareEngine & FareBreakdown (BMRCL distance slabs in ₹ & concessions)  |
 |  - AsciiRouteVisualizer (Terminal track schematics & transfer boxes)     |
-|  - FileExporter (Printable receipts & analytical CSV reports)            |
+|  - FileExporter (Printable receipts in ₹ & analytical CSV reports)       |
 |  - Verification Test Suite (10/10 automated validation tests)            |
 +--------------------------------------------------------------------------+
                                     |
@@ -97,7 +99,7 @@ Represents a **Weighted Directed Edge** in the transit graph:
 
 ### 3.4 `class MetroGraph implements Serializable`
 The core transit graph data structure:
-- **`stations`** (`Map<String, Station>`): A `TreeMap<String, Station>(String.CASE_INSENSITIVE_ORDER)` allowing fast $\mathcal{O}(\log V)$ station lookup and partial name search regardless of user capitalization.
+- **`stations`** (`Map<String, Station>`): A `TreeMap<String, Station>(String.CASE_INSENSITIVE_ORDER)` allowing fast O(log V) station lookup and partial name search regardless of user capitalization.
 - **`adjacencyList`** (`Map<Station, List<Connection>>`): Standard adjacency list representing the graph topology. Each station points to a `List` of outgoing `Connection` objects.
 - **Key Methods**:
   - `addStation(Station)`: Adds station to registry and initializes an empty adjacency list.
@@ -123,35 +125,35 @@ The state wrapper utilized inside the **Min-Priority Queue** for Dijkstra's algo
 Implements all pathfinding algorithms:
 
 #### A. Dijkstra Shortest Physical Distance (`dijkstraDistance`)
-- **Objective**: Minimize total track kilometers $\sum d_i$.
+- **Objective**: Minimize total track kilometers.
 - **Data Structures**: `PriorityQueue<PathNode>` (Min-Heap) + `Map<Station, Double> minCost`.
-- **Time Complexity**: $\mathcal{O}((V + E) \log V)$.
+- **Time Complexity**: O((V + E) log V).
 - **Process**: Standard Dijkstra edge relaxation:
-  $$\text{if } (\text{dist}[u] + \text{weight}(u, v) < \text{dist}[v]) \implies \text{relax edge}$$
+  `if (dist[u] + weight(u, v) < dist[v]) then relax edge`
 
 #### B. State-Expanded Dijkstra for Travel Time (`dijkstraTime`)
 - **The Challenge**: Standard Dijkstra cannot calculate platform interchange transfer penalties because a station node alone does not know which line train the passenger arrived on.
 - **The Solution (State Expansion)**: Expand each vertex into a tuple state:
-  $$\text{State} = (\text{Station}, \text{MetroLine})$$
+  `State = (Station, MetroLine)`
 - **Cost Function**:
-  $$\text{Weight} = \text{Track Time} + \begin{cases} 0, & \text{if } \text{Line}_{\text{prev}} == \text{Line}_{\text{next}} \\ \text{Line Transfer Delay (3.0 to 4.0 min)}, & \text{if } \text{Line}_{\text{prev}} \ne \text{Line}_{\text{next}} \end{cases}$$
-- **Time Complexity**: $\mathcal{O}((V \cdot L + E) \log(V \cdot L))$ where $L \le 5$ lines.
+  `Weight = Track Time + (if Line_prev == Line_next then 0 else Line Transfer Delay [3.0 to 4.0 min])`
+- **Time Complexity**: O((V * L + E) log (V * L)) where L <= 5 lines.
 
 #### C. Lexicographically Optimized Dijkstra for Fewest Interchanges (`dijkstraFewestInterchanges`)
 - **Objective**: Minimize platform transfers first; minimize track distance second.
 - **Cost Weighting**:
-  $$\text{Cost} = (\text{Transfers} \times 10,000.0) + \text{Distance (km)}$$
-- Large coefficient $10,000$ ensures that any path with fewer transfers will strictly dominate a path with more transfers, while using physical distance as the tie-breaker.
+  `Cost = (Transfers * 10,000.0) + Distance (km)`
+- Large coefficient 10,000 ensures that any path with fewer transfers will strictly dominate a path with more transfers, while using physical distance as the tie-breaker.
 
 #### D. Automated Best Commuter Route (`findBestRoute`)
 - Computes three candidate routes:
-  1. $R_{\text{time}}$ (Fastest Travel Time)
-  2. $R_{\text{transfers}}$ (Fewest Line Interchanges)
-  3. $R_{\text{distance}}$ (Shortest Physical Distance)
+  1. Fastest Travel Time candidate route
+  2. Fewest Line Interchanges candidate route
+  3. Shortest Physical Distance candidate route
 - Evaluates candidates against the **Commuter Friction Cost Function**:
-  $$\text{Friction Score} = \text{Travel Time (min)} + (\text{Interchanges} \times 7.0) + (\text{Distance (km)} \times 0.15)$$
+  `Friction Score = Travel Time (min) + (Interchanges × 7.0) + (Distance (km) × 0.15)`
 - **Why this heuristic works**:
-  - In real transit, changing platforms involves walking across multi-level concourses, ticket gates, stairs/elevators, and waiting for the next train schedule. Commuter studies equate 1 transfer to approximately $7.0$ minutes of physical exertion/stress.
+  - In real transit, changing platforms involves walking across multi-level concourses, ticket gates, stairs/elevators, and waiting for the next train schedule. Commuter studies equate 1 transfer to approximately 7.0 minutes of physical exertion/stress.
   - If a direct single-line route takes only 2 extra minutes of riding time, commuters overwhelmingly prefer it over switching trains. However, if staying on one line causes an enormous circuitous detour (+25 km), the formula automatically selects the transfer route.
 
 #### E. Backtracking & Segment Grouping (`reconstructRoute`)
@@ -163,7 +165,7 @@ Implements all pathfinding algorithms:
 
 ## 4. Deep Dive into `Main.java` (Application & Presentation)
 
-`Main.java` coordinates user interactions, fare computation, data formatting, and automated verification tests.
+`Main.java` coordinates user interactions, Rupee (₹) fare computation, data formatting, and automated verification tests.
 
 ### 4.1 `enum TicketType`
 Models official BMRCL ticketing and concession categories:
@@ -174,17 +176,17 @@ Models official BMRCL ticketing and concession categories:
 5. **SENIOR_CITIZEN**: Senior citizen pass (30% discount).
 
 ### 4.2 `class FareEngine` & `class FareBreakdown`
-Computes passenger fares according to official BMRCL transit policy:
+Computes passenger fares in Indian Rupees (₹) according to official BMRCL transit policy:
 - **Distance Slabs**:
-  - $0.0 \text{ to } 2.0\text{ km} \rightarrow ₹10.00$
-  - $2.1 \text{ to } 5.0\text{ km} \rightarrow ₹20.00$
-  - $5.1 \text{ to } 12.0\text{ km} \rightarrow ₹30.00$
-  - $12.1 \text{ to } 21.0\text{ km} \rightarrow ₹40.00$
-  - $21.1 \text{ to } 32.0\text{ km} \rightarrow ₹50.00$
-  - $> 32.0\text{ km} \rightarrow ₹60.00$
+  - 0.0 to 2.0 km -> ₹10.00
+  - 2.1 to 5.0 km -> ₹20.00
+  - 5.1 to 12.0 km -> ₹30.00
+  - 12.1 to 21.0 km -> ₹40.00
+  - 21.1 to 32.0 km -> ₹50.00
+  - > 32.0 km -> ₹60.00
 - **Airport Corridor Infrastructure Surcharge**:
-  - $+₹20.00$ added automatically when origin or destination is `KIAL Airport Terminal`.
-- **Concessions**: Base fare is reduced by the ticket discount percentage, with a minimum fare floor of $₹10.00$.
+  - +₹20.00 added automatically when origin or destination is `KIAL Airport Terminal`.
+- **Concessions**: Base fare is reduced by the ticket discount percentage, with a minimum fare floor of ₹10.00.
 
 ### 4.3 `class NetworkDataInitializer`
 Initializes the **63 stations** across Bengaluru's rapid transit system:
@@ -194,14 +196,14 @@ Initializes the **63 stations** across Bengaluru's rapid transit system:
 - **Pink Line (11 stations)**: Kalena Agrahara, IIM Bangalore, JP Nagar 4th Phase, Jayadeva Hospital, Dairy Circle, Lakkasandra, Langford Town, MG Road, Shivaji Nagar, Bengaluru Cantonment, Tannery Road, Nagawara.
 - **Blue Line / ORR & Airport (13 stations)**: Central Silk Board, HSR Layout, Bellandur, Kadubeesanahalli, Marathahalli, Doddanekundi, KR Puram, Kalyan Nagar, Nagawara, Hebbal, Yeshwanthpur, Yelahanka, Doddajala, KIAL Airport Terminal.
 - **Major Interchanges**:
-  - *Majestic*: Purple $\leftrightarrow$ Green
-  - *MG Road*: Purple $\leftrightarrow$ Pink
-  - *Central Silk Board*: Yellow $\leftrightarrow$ Blue
-  - *KR Puram*: Purple $\leftrightarrow$ Blue
-  - *Jayadeva Hospital*: Yellow $\leftrightarrow$ Pink
-  - *RV Road*: Green $\leftrightarrow$ Yellow
-  - *Nagawara*: Pink $\leftrightarrow$ Blue
-  - *Yeshwanthpur*: Green $\leftrightarrow$ Blue
+  - *Majestic*: Purple <-> Green
+  - *MG Road*: Purple <-> Pink
+  - *Central Silk Board*: Yellow <-> Blue
+  - *KR Puram*: Purple <-> Blue
+  - *Jayadeva Hospital*: Yellow <-> Pink
+  - *RV Road*: Green <-> Yellow
+  - *Nagawara*: Pink <-> Blue
+  - *Yeshwanthpur*: Green <-> Blue
 
 ### 4.4 `class AsciiRouteVisualizer`
 Renders graphical ASCII schematics directly in the terminal:
@@ -217,7 +219,7 @@ Renders graphical ASCII schematics directly in the terminal:
 3. **Summary Metrics Bar**: Total kilometers, minutes, stop count, and transfer count.
 
 ### 4.5 `class FileExporter`
-- **`exportJourneyReceipt`**: Writes a formatted receipt (`exports/receipt_*.txt`) with journey summary, segment breakdown, and fare audit.
+- **`exportJourneyReceipt`**: Writes a formatted receipt (`exports/receipt_*.txt`) with journey summary, segment breakdown, and Rupee (₹) fare audit.
 - **`exportRouteToCsv`**: Writes turn-by-turn CSV with distance and time intervals (`exports/route_*.csv`).
 - **`exportNetworkDirectoryCsv`**: Dumps all 63 stations, lines, and operational statuses (`exports/metro_network_stations.csv`).
 
@@ -226,12 +228,12 @@ Utility class providing safe terminal formatting, divider lines, and robust user
 
 ### 4.7 Automated Test Suite (`runVerificationTests()`)
 Contains 10 automated unit and integration tests verifying:
-1. Network size & interchange hub connectivity ($\ge 30$ stations, $\ge 5$ interchanges).
-2. Direct single-line journey routing (Whitefield $\rightarrow$ Majestic on Purple Line).
-3. Direct Green Line traversal (Madavara $\rightarrow$ Silk Institute).
-4. Multi-line interchange pathfinding with transfer detection (Whitefield $\rightarrow$ Lalbagh via Majestic).
-5. Fare calculation slabs and concession discount formulas.
-6. Airport Express corridor surcharge application ($+₹20.00$).
+1. Network size & interchange hub connectivity (>= 30 stations, >= 5 interchanges).
+2. Direct single-line journey routing (Whitefield -> Majestic on Purple Line).
+3. Direct Green Line traversal (Madavara -> Silk Institute).
+4. Multi-line interchange pathfinding with transfer detection (Whitefield -> Lalbagh via Majestic).
+5. Fare calculation slabs and concession discount formulas in Indian Rupees (₹).
+6. Airport Express corridor surcharge application (+₹20.00).
 7. Dynamic disruption rerouting (closing Majestic forces rerouting via outer corridors).
 8. File export creation (receipt `.txt`, route `.csv`, network `.csv`).
 9. Automated Best Route optimization logic.
@@ -245,12 +247,12 @@ When running `java Main`, you are presented with an 8-option interactive console
 
 | Option | Feature | What Happens Under the Hood |
 | :--- | :--- | :--- |
-| **[1]** | **Find Best Route & Visual Track Map** | Prompts for origin, destination, and ticket type. Executes `RouteEngine.findBestRoute()`, renders ASCII track schematic, prints itemized fare breakdown, compares all concession passes, and prompts for text receipt export. |
+| **[1]** | **Find Best Route & Visual Track Map** | Prompts for origin, destination, and ticket type. Executes `RouteEngine.findBestRoute()`, renders ASCII track schematic, prints itemized fare breakdown in ₹, compares all concession passes in ₹, and prompts for text receipt export. |
 | **[2]** | **Explore Transit Network** | Sub-menu to inspect all 5 transit lines, inspect stations along a line, list all 8 interchange hubs, search stations by keyword, or list all 63 stations alphabetically. |
-| **[3]** | **View Official Fare Structure** | Displays BMRCL distance slabs, the ₹20 Airport surcharge rule, and concession percentage discounts. |
+| **[3]** | **View Official Fare Structure** | Displays BMRCL distance slabs in ₹, the +₹20.00 Airport surcharge rule, and concession percentage discounts. |
 | **[4]** | **Network Operations Simulator** | Maintenance mode simulator: close or reopen any station or track segment. Subsequent route calculations automatically route around closed infrastructure. Also allows adding custom stations or tracks. |
-| **[5]** | **Recent Journey History** | Displays the session's last 25 planned routes with trip IDs, timestamps, and payable fares. Allows selecting any past trip ID to re-render its track schematic. |
-| **[6]** | **Export Data** | Exports last journey receipt (`.txt`), route path (`.csv`), or the complete 63-station network directory (`.csv`). |
+| **[5]** | **Recent Journey History** | Displays the session's last 25 planned routes with trip IDs, timestamps, and payable fares in ₹. Allows selecting any past trip ID to re-render its track schematic. |
+| **[6]** | **Export Data** | Exports last journey receipt (`.txt`) with ₹ pricing, route path (`.csv`), or the complete 63-station network directory (`.csv`). |
 | **[7]** | **Run Verification Tests** | Runs the complete 10/10 test suite directly inside the console session. |
 | **[8]** | **Exit** | Terminates the console session with a farewell banner. |
 
@@ -286,27 +288,27 @@ java Main --test
 
 | Requirement / Task | Chosen Data Structure | Algorithm | Time Complexity | Space Complexity |
 | :--- | :--- | :--- | :--- | :--- |
-| **Metro Network Graph** | Adjacency List (`Map<Station, List<Connection>>`) | Graph Representation | $\mathcal{O}(1)$ edge insert | $\mathcal{O}(V + E)$ |
-| **Station Registry & Lookup** | `TreeMap<String, Station>` | Balanced BST Search | $\mathcal{O}(\log V)$ | $\mathcal{O}(V)$ |
-| **Shortest Track Distance** | `PriorityQueue<PathNode>` | Dijkstra's Algorithm | $\mathcal{O}((V + E) \log V)$ | $\mathcal{O}(V)$ |
-| **Fastest Travel Time** | `PriorityQueue<PathNode>` | State-Expanded Dijkstra | $\mathcal{O}((V \cdot L + E) \log(V \cdot L))$ | $\mathcal{O}(V \cdot L)$ |
-| **Fewest Transfers** | `PriorityQueue<PathNode>` | Lexicographical Dijkstra | $\mathcal{O}((V \cdot L + E) \log(V \cdot L))$ | $\mathcal{O}(V \cdot L)$ |
-| **Best Commuter Route** | Candidate Array of Routes | Friction Score Heuristic | $\mathcal{O}(1)$ evaluation | $\mathcal{O}(1)$ |
-| **Path Reconstruction** | Linked Node Chain (`previous`) | Backtracking & Reverse | $\mathcal{O}(K)$ ($K = \text{stops}$) | $\mathcal{O}(K)$ |
-| **Disruption Avoidance** | Boolean flag checks on nodes/edges | Filtered Dijkstra Traversal | $\mathcal{O}((V + E) \log V)$ | $\mathcal{O}(V)$ |
+| **Metro Network Graph** | Adjacency List (`Map<Station, List<Connection>>`) | Graph Representation | O(1) edge insert | O(V + E) |
+| **Station Registry & Lookup** | `TreeMap<String, Station>` | Balanced BST Search | O(log V) | O(V) |
+| **Shortest Track Distance** | `PriorityQueue<PathNode>` | Dijkstra's Algorithm | O((V + E) log V) | O(V) |
+| **Fastest Travel Time** | `PriorityQueue<PathNode>` | State-Expanded Dijkstra | O((V * L + E) log (V * L)) | O(V * L) |
+| **Fewest Transfers** | `PriorityQueue<PathNode>` | Lexicographical Dijkstra | O((V * L + E) log (V * L)) | O(V * L) |
+| **Best Commuter Route** | Candidate Array of Routes | Friction Score Heuristic | O(1) evaluation | O(1) |
+| **Path Reconstruction** | Linked Node Chain (`previous`) | Backtracking & Reverse | O(K) (K = stops) | O(K) |
+| **Disruption Avoidance** | Boolean flag checks on nodes/edges | Filtered Dijkstra Traversal | O((V + E) log V) | O(V) |
 
 ---
 
 ## 8. Viva & Technical Interview Defense Questions
 
 1. **Why is an Adjacency List used instead of an Adjacency Matrix?**
-   - Metro graphs are very sparse: each station connects to only 2 adjacent stations (or 3-4 at interchanges). An adjacency matrix would consume $\mathcal{O}(V^2)$ space (most cells containing 0). An adjacency list consumes only $\mathcal{O}(V + E)$ space and allows iterating over neighbors in $\mathcal{O}(\text{degree}(v))$ time.
+   - Metro graphs are very sparse: each station connects to only 2 adjacent stations (or 3-4 at interchanges). An adjacency matrix would consume O(V^2) space (most cells containing 0). An adjacency list consumes only O(V + E) space and allows iterating over neighbors in O(degree(v)) time.
 
 2. **Why does travel time optimization require State Expansion in Dijkstra?**
-   - Standard Dijkstra tracks only the vertex $v$. However, platform transfer delays (3 to 4 minutes) only occur when a commuter switches from Line A to Line B. Staying on Line A through an interchange station incurs zero transfer delay. Expanding state to $(\text{Station}, \text{CurrentLine})$ allows the cost function to inspect the incoming line and conditionally penalize line switches.
+   - Standard Dijkstra tracks only the vertex v. However, platform transfer delays (3 to 4 minutes) only occur when a commuter switches from Line A to Line B. Staying on Line A through an interchange station incurs zero transfer delay. Expanding state to (Station, CurrentLine) allows the cost function to inspect the incoming line and conditionally penalize line switches.
 
 3. **What is the Commuter Friction Cost Function?**
-   - Formula: $\text{Score} = \text{Time (min)} + (\text{Interchanges} \times 7.0) + (\text{Distance} \times 0.15)$.
+   - Formula: `Score = Time (min) + (Interchanges × 7.0) + (Distance × 0.15)`.
    - Platform transfers add significant physical and mental fatigue (stairs, crowds, platform changes, waiting). Setting 1 transfer equal to 7 minutes of travel friction prevents recommending jarring multi-transfer routes that save only 30 seconds of track time.
 
 4. **How are station disruptions handled dynamically?**

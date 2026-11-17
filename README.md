@@ -47,7 +47,7 @@ java Main --test
 
 1. **Automated Best Route Recommendation**:
    - Evaluates travel duration, transfer convenience, and physical distance using a commuter friction score to recommend the optimal path:
-     $$\text{Score} = \text{Time (mins)} + (\text{Interchanges} \times 7.0) + (\text{Distance (km)} \times 0.15)$$
+     `Score = Time (mins) + (Interchanges × 7.0) + (Distance (km) × 0.15)`
 2. **Terminal Graphical Track Schematic**:
    - Renders a visual schematic track map directly inside the console with station symbols (`[START] *`, intermediate `o`, transfer boxes with platform dwell buffers, and `[DESTINATION] #`).
 3. **Complete Bengaluru Namma Metro Network**:
@@ -72,12 +72,27 @@ java Main --test
 
 | Component | File | Data Structure / Algorithm | Time Complexity | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
-| **Network Graph** | `MetroDSA.java` | Adjacency List (`Map<Station, List<Connection>>`) | $\mathcal{O}(V + E)$ space | Bidirectional metro topology |
-| **Shortest Distance** | `MetroDSA.java` | Dijkstra with Min-Priority Queue | $\mathcal{O}((V + E) \log V)$ | Minimizes total physical kilometers |
-| **Fastest Travel Time**| `MetroDSA.java` | State-Expanded Dijkstra $(\text{Station}, \text{Line})$ | $\mathcal{O}((V \cdot L + E) \log (V \cdot L))$ | Accounts for track time + transfer penalties |
-| **Fewest Transfers** | `MetroDSA.java` | Lexicographical Dijkstra | $\mathcal{O}((V \cdot L + E) \log (V \cdot L))$ | Minimizes platform interchanges |
-| **Best Commuter Route**| `MetroDSA.java` | Friction Score Heuristic | $\mathcal{O}(1)$ evaluation | Balances time, walking transfer strain, and distance |
-| **Station Directory**| `MetroDSA.java` | Case-Insensitive `TreeMap` | $\mathcal{O}(\log V)$ lookup | Alphabetical indexing & prefix search |
+| **Network Graph** | `MetroDSA.java` | Adjacency List (`Map<Station, List<Connection>>`) | O(V + E) space | Bidirectional metro topology |
+| **Shortest Distance** | `MetroDSA.java` | Dijkstra with Min-Priority Queue | O((V + E) log V) | Minimizes total physical kilometers |
+| **Fastest Travel Time**| `MetroDSA.java` | State-Expanded Dijkstra (Station, Line) | O((V * L + E) log (V * L)) | Accounts for track time + transfer penalties |
+| **Fewest Transfers** | `MetroDSA.java` | Lexicographical Dijkstra | O((V * L + E) log (V * L)) | Minimizes platform interchanges |
+| **Best Commuter Route**| `MetroDSA.java` | Friction Score Heuristic | O(1) evaluation | Balances time, walking transfer strain, and distance |
+| **Station Directory**| `MetroDSA.java` | Case-Insensitive `TreeMap` | O(log V) lookup | Alphabetical indexing & prefix search |
+
+---
+
+## 📊 Fare Slabs Reference (Indian Rupee ₹)
+
+| Distance Range | Standard Token | Smart Card (10% Off) | Student Pass (25% Off) | Senior Citizen (30% Off) |
+| :--- | :--- | :--- | :--- | :--- |
+| **0.0 – 2.0 km** | ₹10.00 | ₹10.00 (Min. Fare) | ₹10.00 (Min. Fare) | ₹10.00 (Min. Fare) |
+| **2.1 – 5.0 km** | ₹20.00 | ₹18.00 | ₹15.00 | ₹14.00 |
+| **5.1 – 12.0 km** | ₹30.00 | ₹27.00 | ₹22.50 | ₹21.00 |
+| **12.1 – 21.0 km** | ₹40.00 | ₹36.00 | ₹30.00 | ₹28.00 |
+| **21.1 – 32.0 km** | ₹50.00 | ₹45.00 | ₹37.50 | ₹35.00 |
+| **> 32.0 km** | ₹60.00 | ₹54.00 | ₹45.00 | ₹42.00 |
+
+*Note: Journeys involving KIAL Airport Terminal include a ₹20.00 infrastructure surcharge.*
 
 ---
 
