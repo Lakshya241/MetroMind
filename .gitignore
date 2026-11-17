@@ -1,10 +1,7 @@
-# Compiled class files
-bin/
+# Compiled Java classes
 *.class
+bin/
 
-# Temporary build files
-sources.txt
-
-# OS generated files
-.DS_Store
-Thumbs.db
+# Generated export receipts and CSVs (keep exports directory)
+exports/*
+!exports/.gitkeep

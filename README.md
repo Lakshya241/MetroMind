@@ -1,191 +1,169 @@
 <div align="center">
 
-# 🚇 METROMIND
-### Smart Metro Route & Fare Computation Engine
+# MetroMind
 
-A Java-based Bengaluru Metro route planner featuring Dijkstra’s shortest-path algorithms, fare calculation, interchange optimization, and network disruption simulation.
-**Bengaluru Namma Metro (BMRCL) Edition**
+**Bengaluru Namma Metro — Transit Routing & Fare Engine**
 
-[![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Standard Library](https://img.shields.io/badge/Dependencies-Zero%20External-2ea44f?style=for-the-badge&logo=java&logoColor=white)](src/)
-[![Network](https://img.shields.io/badge/Network-63%20Stations%20%7C%205%20Lines-0969da?style=for-the-badge&logo=google-maps&logoColor=white)](src/util/NetworkDataInitializer.java)
-[![Algorithm](https://img.shields.io/badge/Dijkstra-Tri--Criteria%20%2B%20Friction-8957e5?style=for-the-badge&logo=diagram-next&logoColor=white)](src/route/RouteEngine.java)
-[![Test Suite](https://img.shields.io/badge/Tests-10%2F10%20Passing-brightgreen?style=for-the-badge&logo=checkmarx&logoColor=white)](src/MetroMindTest.java)
-
-A high-performance transit navigation, shortest-route optimization, and automated fare auditing engine designed for the **Bengaluru Namma Metro** network. Engineered in pure Java 17 with state-expanded graph algorithms, slab-based pricing, network disruption simulation, and a terminal track schematic.
-
-[Overview](#-overview) • [Preview](#-application-preview) • [Features](#-key-features) • [Architecture](#-system-architecture) • [Routing](#-how-routing-works) • [Quick Start](#-getting-started) • [Docs](#-detailed-documentation)
-
----
-
-</div>
-
-## 📌 Overview
-
-MetroMind models the **Bengaluru Namma Metro (BMRCL)** transit grid as a weighted directed graph covering 63 stations across 5 lines (*Purple, Green, Yellow, Pink, Blue*). Standard transit algorithms minimize only distance or time, ignoring the physical fatigue of switching platforms at massive interchange hubs like *Majestic* or *Silk Board*. MetroMind computes candidate paths across three dimensions—physical distance, travel time, and interchange count—and resolves them using a **Commuter Friction Cost Function** to deliver a single, practically optimal recommendation with deterministic fare computation.
-
----
-
-## 📸 Application Preview
-
-<div align="center">
-
-| 1. Startup & Network Summary | 2. Main Navigation Menu |
-| :---: | :---: |
-| <img src="assets/screenshots/01_welcome_banner.png" width="420" alt="Startup Screen"/> | <img src="assets/screenshots/02_main_menu.png" width="420" alt="Main Navigation Menu"/> |
-| *63-station network status across 5 transit lines* | *Modular 7-option interactive menu system* |
-
-| 3. Visual Track Schematic | 4. Fare Breakdown & Matrix |
-| :---: | :---: |
-| <img src="assets/screenshots/04_route_schematic.png" width="420" alt="Terminal Track Schematic"/> | <img src="assets/screenshots/05_fare_breakdown.png" width="420" alt="Fare Computation Breakdown"/> |
-| *Corridor overview, milestone stops, and transfer bridge* | *Distance slab, concession savings, and pass comparison* |
-
-| 5. Station Search & Auto-Matching | 6. Disruption Simulator & Rerouting |
-| :---: | :---: |
-| <img src="assets/screenshots/03_station_search.png" width="420" alt="Station Search & Selection"/> | <img src="assets/screenshots/06_network_disruption.png" width="420" alt="Network Operations Simulator"/> |
-| *Case-insensitive partial matching and ticket selection* | *Station/track closure with dynamic Outer Ring Road rerouting* |
+[![Java](https://img.shields.io/badge/Java-11%2B-ED8B00?logo=openjdk&logoColor=white)](https://www.oracle.com/java/technologies/)
+[![DSA](https://img.shields.io/badge/Algorithm-Dijkstra%20%2F%20State--Expanded-6C4AB6)](https://github.com/Lakshya241/MetroMind)
+[![Network](https://img.shields.io/badge/Network-63%20Stations%20%7C%205%20Lines-28A745)](https://github.com/Lakshya241/MetroMind)
+[![Tests](https://img.shields.io/badge/Tests-10%2F10%20Passing-brightgreen)](https://github.com/Lakshya241/MetroMind)
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-Lakshya241%2FMetroMind-181717?logo=github)](https://github.com/Lakshya241/MetroMind)
 
 </div>
 
 ---
 
-## ✨ Key Features
+## Overview
 
-| Feature | Description |
-|---|---|
-| **Multi-Criteria Dijkstra** | Runs 3 Dijkstra variants: shortest physical distance, fastest travel time, and fewest line interchanges. |
-| **Friction-Score Best Route** | Automatically balances duration, line transfers, and track distance via commuter friction heuristic. |
-| **Terminal Track Schematic** | Renders an ASCII/Unicode track map with station nodes, interchange bridges, and commute metrics. |
-| **Slab-Based Fare Engine** | Accurately calculates official BMRCL distance slabs (₹10 to ₹60) with a ₹10.00 minimum fare floor. |
-| **5 Concession Categories** | Computes discounts up to 30% across Tokens, Smart Cards (Peak/Off-Peak), Student, and Senior Citizen passes. |
-| **Airport Express Surcharge** | Applies a flat +₹20.00 infrastructure surcharge for commutes to/from *KIAL Airport Terminal*. |
-| **Disruption Simulator** | Toggles station and track operational states at runtime; routes automatically navigate around closures. |
-| **Multi-Format Data Exports** | Generates printable text travel receipts (`.txt`), turn-by-turn route logs (`.csv`), and network directories (`.csv`). |
+MetroMind is a **Java command-line transit routing and fare computation engine** that models the Bengaluru Namma Metro (BMRCL) network as a weighted directed graph. It finds optimal routes across 63 stations on 5 lines using multiple Dijkstra variants, renders ASCII track schematics, computes BMRCL distance-slab fares with concession passes, and simulates live network disruptions.
+
+> **Note:** This is a project model. Fares, distances, and station data are approximations and do not represent live BMRCL information.
 
 ---
 
-## 🏛️ System Architecture
+## Features
 
-MetroMind adheres to a layered architecture with a unified **Service Facade** (`MetroMindService`), keeping presentation and user interaction strictly isolated from graph mutations and pathfinding state:
+- 🗺️ **Multi-objective routing** — shortest distance, fastest time, fewest transfers, and a scored *recommended route*
+- 🔀 **State-expanded Dijkstra** — models per-line transfer penalties (3–4 min) for accurate travel-time calculation
+- 💡 **Commuter Friction Heuristic** — `Score = Time + (Transfers × 7) + (Distance × 0.15)` to recommend the most practical route
+- 🖥️ **ASCII track visualizer** — corridor overview and station-by-station terminal schematic with transfer boxes
+- 🎫 **BMRCL fare engine** — 6 distance slabs (₹10–₹60), ₹20 Airport surcharge, 5 ticket/concession types
+- 🚧 **Disruption simulator** — close/reopen stations or track segments; routing avoids unavailable infrastructure instantly
+- 📋 **Journey history** — session log of last 25 trips with timestamps, trip IDs, and re-renderable schematics
+- 📁 **Export** — printable text receipts (`.txt`) and analytical CSVs (route path, full network directory)
+- ✅ **Built-in test suite** — 10 automated verification tests covering routing, fares, disruptions, and exports
 
-```mermaid
-flowchart TD
-    CLI["Main.java (Console UI)"] --> SVC["MetroMindService.java (Facade)"]
-    CLI --> VIS["AsciiRouteVisualizer.java (Schematic)"]
-    SVC --> GRAPH["MetroGraph.java (Adjacency List)"]
-    SVC --> ROUTE["RouteEngine.java (Dijkstra x3)"]
-    SVC --> FARE["FareEngine.java (Slabs & Passes)"]
-    SVC --> EXP["FileExporter.java (Receipts & CSVs)"]
-    INIT["NetworkDataInitializer.java"] --> GRAPH
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      USER  (CLI)                        │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│              APPLICATION LAYER  (Main.java)             │
+│                                                         │
+│  ConsoleUtils · MetroMindService · FareEngine           │
+│  NetworkDataInitializer · AsciiRouteVisualizer          │
+│  FileExporter · Verification Test Suite                 │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│          DSA CORE  (MetroDSA.java)                      │
+│                                                         │
+│  MetroGraph (Adjacency List)  ·  Station (Vertex)       │
+│  Connection (Weighted Edge)   ·  PathNode (PQ State)    │
+│  RouteEngine: dijkstraDistance · dijkstraTime           │
+│               dijkstraFewestInterchanges · findBestRoute│
+└─────────────────────────────────────────────────────────┘
 ```
 
----
-
-## 🧭 How Routing Works
-
-MetroMind evaluates three independent Dijkstra searches, then ranks candidates using a **Commuter Friction Cost Function**:
-
-| Optimization Target | Objective Function | Edge Weight ($w$) | State Key |
-|---|---|---|---|
-| **Shortest Distance** | Minimize physical kilometers | Track Distance ($\text{km}$) | `Station` |
-| **Fastest Time** | Minimize minutes + transfer penalties | Track Minutes $+$ Transfer Delay ($3.0 - 4.0\text{ min}$) | `(Station, CurrentLine)` |
-| **Fewest Interchanges** | Minimize platform transfers | $(\text{Transfers} \times 10,000) + \text{Distance}$ | `(Station, CurrentLine)` |
-
-$$\text{Commuter Friction Score } \mathcal{F}(R) = \text{Time (min)} + 7.0 \times \text{Transfers} + 0.15 \times \text{Distance (km)}$$
-
-Each transfer incurs $7.0$ points of friction (modeling walking, stairs, and wait times), while a $0.15$ points/km weight breaks time ties in favor of geographically direct paths. The candidate route with the lowest overall score is recommended.
+| Algorithm | Objective | Complexity |
+|---|---|---|
+| `dijkstraDistance` | Minimize track distance (km) | O((V + E) log V) |
+| `dijkstraTime` | Minimize travel time with transfer delays | O((V·L + E) log(V·L)) |
+| `dijkstraFewestInterchanges` | Minimize transfers, then distance | O((V·L + E) log(V·L)) |
+| `findBestRoute` | Commuter friction score across all 3 candidates | O(1) evaluation |
 
 ---
 
-## 💻 Getting Started
+## Network
+
+5 lines · 63 stations · 8 interchange hubs
+
+| Line | Route | Stations |
+|---|---|---|
+| 🟣 Purple | Challaghatta ↔ Whitefield (Kadugodi) | 16 |
+| 🟢 Green | Madavara (BIEC) ↔ Silk Institute | 17 |
+| 🟡 Yellow | RV Road ↔ Bommasandra (Electronic City) | 11 |
+| 🩷 Pink | Kalena Agrahara ↔ Nagawara | 11 |
+| 🔵 Blue | Central Silk Board ↔ KIAL Airport Terminal | 13 |
+
+**Key interchanges:** Majestic (Purple↔Green) · MG Road (Purple↔Pink) · Central Silk Board (Yellow↔Blue) · KR Puram (Purple↔Blue) · Jayadeva Hospital (Yellow↔Pink) · RV Road (Green↔Yellow) · Nagawara (Pink↔Blue) · Yeshwanthpur (Green↔Blue)
+
+---
+
+## Fare Structure
+
+| Distance | Base Fare | Airport Surcharge |
+|---|---|---|
+| 0 – 2 km | ₹10 | +₹20 (KIAL journeys) |
+| 2.1 – 5 km | ₹20 | |
+| 5.1 – 12 km | ₹30 | |
+| 12.1 – 21 km | ₹40 | |
+| 21.1 – 32 km | ₹50 | |
+| > 32 km | ₹60 | |
+
+Concession passes: Token (0%) · Smart Card (10%) · Smart Card Off-Peak (20%) · Student (25%) · Senior Citizen (30%) · Minimum fare floor: ₹10
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- **JDK 17 or higher** (OpenJDK Temurin, Oracle, etc.)
-- **Operating System:** Windows, macOS, or Linux
 
-### Quick Start (Windows)
-```cmd
-compile.bat    :: Compiles all Java sources into bin/
-run.bat        :: Launches the interactive terminal application
-test.bat       :: Runs the automated 10-test verification suite
+- JDK 11 or later
+- `java` and `javac` on your `PATH`
+
+### Run (Windows — Recommended)
+
+```bat
+run.bat
 ```
 
-### Manual Cross-Platform CLI
+```bat
+run.bat --test
+```
+
+### Run (Any Platform)
+
 ```bash
-# 1. Compile
-javac -d bin -sourcepath src src/Main.java src/MetroMindTest.java src/model/*.java src/graph/*.java src/route/*.java src/fare/*.java src/service/*.java src/util/*.java
+# Compile
+javac *.java
 
-# 2. Run Application
-java -cp bin Main
+# Launch interactive app
+java Main
 
-# 3. Run Automated Tests
-java -cp bin MetroMindTest
+# Run verification tests
+java Main --test
 ```
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
-```text
-java2/
-├── src/
-│   ├── Main.java                       # Application entry point & interactive UI controller
-│   ├── MetroMindTest.java              # Standalone 10-test automated verification suite
-│   ├── model/                          # Domain models (Station, Connection, MetroLine, TicketType, RouteResult)
-│   ├── graph/                          # MetroGraph adjacency list multigraph & TreeMap index
-│   ├── route/                          # RouteEngine (Dijkstra x3) & PathNode priority queue entries
-│   ├── fare/                           # FareEngine (distance slabs, airport surcharge, concessions)
-│   ├── service/                        # MetroMindService application facade
-│   └── util/                           # Visualizer, ConsoleUtils, FileExporter, NetworkDataInitializer
-├── assets/screenshots/                 # High-resolution terminal capture images
-├── exports/                            # Generated passenger receipts (.txt) and route CSV spreadsheets
-├── compile.bat / run.bat / test.bat    # Windows one-click compilation and execution scripts
-├── README.md                           # Compact project landing page
-├── explain.md                          # Comprehensive beginner tutorial & class walkthrough
-└── viva_dsa_guide.md                   # Algorithm complexity analysis & viva defense guide
+```
+MetroMind/
+├── Main.java          # CLI, fare engine, network setup, visualizer, exports, tests
+├── MetroDSA.java      # Graph model and Dijkstra routing algorithms
+├── run.bat            # Windows one-click compile-and-run launcher
+├── EXPLANATION.md     # Full implementation & DSA deep-dive
+└── exports/           # Auto-generated receipts (.txt) and CSVs
 ```
 
----
-
-## 🧪 Testing & Verification
-
-MetroMind includes a custom zero-dependency automated verification suite in [`src/MetroMindTest.java`](src/MetroMindTest.java):
-
-```text
-==================================================
-   METROMIND (NAMMA METRO) VERIFICATION SUITE     
-==================================================
-[TEST 1]  Bengaluru Station Directory & Connectivity  : PASSED (63 stations, 8 interchanges)
-[TEST 2]  Direct Purple Line Route (Whitefield->Majestic): PASSED (Distance: 22.80 km, Stops: 11)
-[TEST 3]  Direct Green Line Route (Madavara->Silk Inst): PASSED (Direct 0-transfer: 36.30 km)
-[TEST 4]  Multi-Line Interchange Route (Whitefield->Lalbagh): PASSED (Transfers: 1 at Majestic)
-[TEST 5]  Fare Calculation Slabs & Discounts         : PASSED (Token: ₹50, SmartCard: ₹45, Student: ₹37.5)
-[TEST 6]  Airport Line Surcharge (Hebbal->KIAL)       : PASSED (Base: ₹50.0 + Surcharge: ₹20.0 = ₹70.0)
-[TEST 7]  Dynamic Disruption Rerouting (Close Majestic): PASSED (Rerouted around closed hub)
-[TEST 8]  File Export (Receipt .txt and Route .csv)   : PASSED (Exported files created in exports/)
-[TEST 9]  Automated Best Route Optimization           : PASSED (Selected optimal commuter path)
-[TEST 10] Terminal Graphical Track Schematic Rendering: PASSED (Visual schematic rendered successfully)
-==================================================
-   TEST RESULTS: 10 / 10 TESTS PASSED (100.0%)
-==================================================
-```
+For a complete walkthrough of every class, algorithm, and design decision, see [`EXPLANATION.md`](EXPLANATION.md).
 
 ---
 
-## 📚 Detailed Documentation
+## Menu Reference
 
-For in-depth explanations, refer to the dedicated companion manuals:
-
-- 📖 **[explain.md](explain.md)** — Beginner-friendly code tutorial covering every class, method, data structure, pseudocode, and step-by-step execution trace.
-- 🎓 **[viva_dsa_guide.md](viva_dsa_guide.md)** — Formal asymptotic Big-O complexity matrix, graph theory proofs, and top 10 academic viva defense questions and answers.
+| Option | Feature |
+|---|---|
+| `[1]` | Find Best Route & ASCII Track Map |
+| `[2]` | Explore Transit Network (lines, stations, interchanges) |
+| `[3]` | View Official Fare Structure |
+| `[4]` | Network Operations Simulator (close / reopen stations & tracks) |
+| `[5]` | Recent Journey History |
+| `[6]` | Export Data (receipt `.txt`, route `.csv`, network directory `.csv`) |
+| `[7]` | Run Verification Tests (10/10) |
+| `[8]` | Exit |
 
 ---
 
-## ⚠️ Limitations & Roadmap
+## Author
 
-- **Current Constraints:** In-memory session state (resets on exit); alphabetical station listing on lines; static timetable durations; 25-trip session history limit.
-- **Future Roadmap:** Embedded SQLite database via JDBC; linked geographic station sequencing; live GTFS-RT feed integration; multi-modal BMTC feeder bus routing; JavaFX/web interactive visualizer.
-
----
-
-## ⚖️ Disclaimer & Credits
+**Lakshya241** · [GitHub](https://github.com/Lakshya241) · [Repository](https://github.com/Lakshya241/MetroMind)
